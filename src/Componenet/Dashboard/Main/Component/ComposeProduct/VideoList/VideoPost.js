@@ -232,7 +232,7 @@ const handleFileChange = (e, field) => {
         </div>
         <div>
           {inputDescription.map((item, idx) => (
-            <div key={idx} className="flex flex-col mb-4">
+            <div key={idx} className="flex flex-col mb-4 text-white">
               <label className="mb-2">{item.name}</label>
               {item.type === "textarea" ? (
                 <textarea

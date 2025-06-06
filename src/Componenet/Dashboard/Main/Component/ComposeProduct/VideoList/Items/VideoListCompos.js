@@ -160,7 +160,7 @@ const VideoListCompos = ({ inputValues, setInputValues }) => {
   ];
 
   return (
-    <div className='p-2 gap-4'>
+    <div className='p-2 gap-4 text-white'>
       {inputCheckBoxItem.map((group, groupIndex) => (
         <div className='p-2 gap-4' key={groupIndex}>
           <input 
