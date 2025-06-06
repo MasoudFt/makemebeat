@@ -18,7 +18,7 @@ const MainSection = ({ OneMusicInfo }) => {
           :
           <img
             className=" h-full w-full rounded-2xl"
-            src={FinalUrl+OneMusicInfo.file_path.replace(/\\/g, "/")}
+            src={FinalUrl+OneMusicInfo.file_pathImage}
             alt="cover"
           />
           }

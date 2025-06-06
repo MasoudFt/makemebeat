@@ -31,16 +31,15 @@ const MusicList = () => {
       const url = `http://localhost:3000/musics/${tokenUserId}/${number}`;
       const res = await axios.get(url);
       setMusicList(res.data);
-      console.log(url);
       const newUrlArray = res.data.map((a) => {
-        const fixedPath = a.file_path.replace(/\\/g, '/'); 
+        const fixedPath = a.file_pathImage.replace(/\\/g, '/'); 
         const cleanedPath = fixedPath.replace(/^"|"$/g, '');
         return `http://localhost:3000/${cleanedPath}`;
       });
       setNewUrls(newUrlArray);
     } catch (error) {
-      console.log(error.response.data);
-      setError(error.response.data);
+      console.log(error);
+      // setError(error.response.data);
     }
   };
 
@@ -77,7 +76,7 @@ const ButtonClassName ="rounded-xl text-white text-xl h-12 font-semibold bg-blac
         {musicList.map((music, index) => (
           <div key={index} className="grid grid-cols-8 border border-zinc-950 py-2 border-b-neutral-800 h-full items-center text-center rounded-t-lg p-1 m-1">
             <p className='p-2 text-xl'>{index + 1}</p>
-            <img src={Imageurl+music.file_path} alt="Cover" className="h-14 w-14 mr-3 rounded-2xl" />
+            <img src={Imageurl+music.file_pathImage} alt="Cover" className="h-14 w-14 mr-3 rounded-2xl" />
             <span className="text-xs font-semibold p-2">{music.title }</span>
             <span className="text-xs  font-semibold p-2">{music.createat=== null?" sgh;":music.createat}</span>
             <span className="text-xs  font-semibold p-2">{music.view ===null?"0":music.view}</span>

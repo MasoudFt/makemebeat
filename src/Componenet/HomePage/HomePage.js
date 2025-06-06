@@ -3,11 +3,8 @@ import React from "react";
 import Slider from "../Comp/Slider";
 import Cart from "../Comp/Cart";
 import WeeklyMusicList from "../WeeklyMusic/WeeklyMusicList";
-// import image1 from "../../../public/UpMainPage/1.jpeg"
-// import image2 from "../../../public/UpMainPage/2.jpeg"
-// import image3 from "../../../public/UpMainPage/3.jpeg"
-// import image4 from "../../../public/UpMainPage/4.jpeg"
-// import axios from "axios";
+import Footer from "../Footer/Footer";
+import MotionGraphic from "../MotionGraphic/MotionGraphic";
 
 const HomePage = () => {
  
@@ -110,7 +107,7 @@ const HomePage = () => {
           موشن گرافی
         </div>
         <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <Cart />
+          <MotionGraphic />
         </div>
         <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
           مجله میک می بیت
@@ -118,17 +115,8 @@ const HomePage = () => {
         <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
           <Cart />
         </div>
-        <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-          قسمت آیکون ها
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <Cart />
-        </div>
-        <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-          Footer
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <Cart />
+        <div className="h-full text-center  text-cyan-50 font-bold ">
+          <Footer />
         </div>
       </div>
     

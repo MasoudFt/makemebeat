@@ -3,7 +3,7 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 import Navbar from "../src/Componenet/Navbar/Navbar";
 import About from "../src/Componenet/About/About";
-import Contact from "../src/Componenet/Contact/Contact";
+import News from "../src/Componenet/News/News"
 import Login from "../src/Componenet/Auth/Login/Login";
 import SignUp from "../src/Componenet/Auth/SignUp/SignUp";
 import HomePage from "./Componenet/HomePage/HomePage";
@@ -13,7 +13,6 @@ import VideoPlayer from "./Componenet/Test/VideoPlayeNEwr";
 import VideoUpload from "./Componenet/Test/VideoPost";
 import Card from "./Componenet/Card/Card";
 import UpNav from "./Componenet/UpNav/UpNav";
-import Input from "./Componenet/Navbar/Input";
 import Slider from "./Componenet/Comp/Slider";
 import MusicPlayer from "./Componenet/MusicPlayer/MusicPlayer";
 import Cart from "./Componenet/Comp/Cart";
@@ -22,7 +21,7 @@ import Rules from "./Componenet/UpNav/Comp/Rules";
 import Tarafe from "./Componenet/UpNav/Comp/Tarafe";
 import Course from "./Componenet/UpNav/Comp/Course";
 import ScrollTop from "./Componenet/Comp/ScrollTop";
-import OneUser from "./Componenet/Dashboard/AdminDashboard/Items/OneUser";
+import OneUser from "./Componenet/Dashboard/AdminDashboard/Items/OneUserInfo/OneUser";
 import Ticket from "./Componenet/Dashboard/Main/Component/Ticket/Ticket";
 import Lottie from "react-lottie-player";
 import AnimationLottie from "./AnimationLottie.json";
@@ -103,7 +102,7 @@ function App() {
               <Route path="/VideoPlayer" element={<VideoPlayer />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
+              <Route path="/news" element={<News />} />
               <Route path="/slider" element={<Slider />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>

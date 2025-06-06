@@ -36,7 +36,7 @@ useEffect(() => {
            </Stack>
          )}
   <div dir="rtl" className="flex flex-col gap-3">
-    <div className="flex-1 bg-zinc-900 rounded-lg shadow p-4">
+    <div className="flex-1 bg-black rounded-lg shadow p-4">
       <div className='flex text-center text-white font-semibold justify-around gap-2 mb-3 border-b pb-2'>
         <div className='w-fit'>ردیف</div>
         <div className='w-14'>کاور محصول</div>
@@ -51,7 +51,7 @@ useEffect(() => {
           style={{ minHeight: '60px' }} 
         >
           <p className="font-xs p-1 text-white">{index + 1}</p>
-          <img src={imageUrl + product.file_path.replace(/\\/g, "/")} className='h-14 w-14 rounded-lg' />
+          <img src={imageUrl + product.file_pathImage} className='h-14 w-14 rounded-lg' />
           <p className="font-xs p-1 w-16 text-white">{product.artistName}</p>
           <p className="font-xs p-1 w-20 text-white">{product.title}</p>
           <p className="font-xs p-1 w-36 text-gray-200">تومان {parseFloat(product.orginalPriceTanzim-product.discountPriceTanzim).toLocaleString()} </p>

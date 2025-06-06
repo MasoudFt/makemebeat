@@ -116,7 +116,7 @@ const finalDuration=formatDuration(duration)
             <div className="flex p-2 justify-center  basis-1/4">
               <img
                 className="rounded-lg h-20 w-20"
-                src={musicList[number].file_path}
+                src={musicList[number].file_pathImage}
                 alt={musicList[number].title}
               />
             </div>

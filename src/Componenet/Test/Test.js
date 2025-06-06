@@ -9,11 +9,14 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { BiDownload } from "react-icons/bi";
 import { MdStarRate } from "react-icons/md";
 import { useDispatch } from "react-redux";
+import { FaRegArrowAltCircleUp } from "react-icons/fa";
+import { FaRegArrowAltCircleDown } from "react-icons/fa";
 import {  showMusicplayer } from "../StateManagement/Action";
 
 const Test = ({infoOneMusic}) => {
   const [musicList, setMusicList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(true);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [show, setShow] = useState(true);
@@ -81,6 +84,7 @@ const Test = ({infoOneMusic}) => {
     }
   };
 
+
   const handleSkipNext = () => {
     if (number < musicList.length - 1) {
       setNumber((last) => last + 1);
@@ -88,15 +92,22 @@ const Test = ({infoOneMusic}) => {
   };
 
   return (
-    <div className="fixed bottom-1 right-2 -left-2  py-2 px-4 w-screen">
-      <div className=" h-24 gap-4 flex flex-row bg-zinc-950 rounded-lg shadow-inner shadow-purple-800 text-white place-items-center">
-        {!loading ? (
-          <>
-            <div className="flex p-2 justify-center  basis-1/4">
-            <IoIosCloseCircleOutline size={35} onClick={()=>dispatch(showMusicplayer(true))}/>
+    <div className={`fixed bottom-1 ${showPlayer ? "h-24" : "h-8"} right-2 -left-2 py-2 px-4 w-screen transition-all duration-500`}>
+    <div className={`h-24 gap-4 flex flex-row ${showPlayer ? " bg-zinc-950" : " bg-transparent "}  rounded-lg shadow-inner shadow-purple-800 text-white place-items-center transition-all duration-500`}>
+      {!loading ? (
+        <>
+          <div className="flex p-2 justify-between basis-1/4">
+            <div className="flex p-2 gap-4 justify-between">
+              <IoIosCloseCircleOutline size={20} onClick={() => dispatch(showMusicplayer(true))} />
+              {showPlayer ? (
+                <FaRegArrowAltCircleUp onClick={() => setShowPlayer(p => !p)} className="mb-12" size={20} />
+              ) : (
+                <FaRegArrowAltCircleDown onClick={() => setShowPlayer(p => !p)} className="mb-12" size={20} />
+              )}
+            </div>
               <img
                 className="rounded-lg h-20 w-20"
-                src={baseUrl+infoOneMusic.file_path.replace(/\\/g, "/")}
+                src={baseUrl+infoOneMusic.file_pathImage}
                 alt={infoOneMusic.title}
               />
             </div>

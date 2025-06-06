@@ -1,224 +1,203 @@
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect, useState, useCallback } from "react";
 import Box from "@mui/material/Box";
 import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
 import { RiDiscountPercentLine } from "react-icons/ri";
-import { MdArrowCircleLeft } from "react-icons/md";
+import { MdArrowCircleLeft, MdArrowCircleRight } from "react-icons/md";
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import { MdArrowCircleRight } from "react-icons/md";
 import axios from "axios";
 import { fetchurlMuiscFile, getOneMusicInfo, showMusicplayer } from "../StateManagement/Action";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+// import 'react-lazy-load-image-component/src/effects/blur.css';
+import { motion, AnimatePresence } from "framer-motion";
 
 const WeeklyMusicList = () => {
   const [musicList, setMusicList] = useState([]);
-  const navigate=useNavigate();
-  const dispatch=useDispatch();
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   
   const FinalUrl = `http://localhost:3000/`;
-  const getMusic = async () => {
+  
+  const getMusic = useCallback(async () => {
     try {
+      setLoading(true);
       const url = `http://localhost:3000/musics`;
       const res = await axios.get(url);
       setMusicList(res.data);
     } catch (error) {
       console.log(error.response);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     getMusic();
-  
-  }, []);
+  }, [getMusic]);
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const itemsPerPage = 3;
 
-  const handelNextIndexPic = () => {
-    if (currentSlide < product.length - 1) {
-      setCurrentSlide((e) => e + 1);
+  const handelNextIndexPic = useCallback(() => {
+    if (currentSlide + itemsPerPage < musicList.length) {
+      setCurrentSlide(prev => prev + itemsPerPage);
     } else {
       setCurrentSlide(0);
     }
-  };
+  }, [currentSlide, musicList.length]);
 
-  const handelPervIndexPic = () => {
-    if (currentSlide !== 0) {
-      setCurrentSlide((e) => e - 1);
+  const handelPervIndexPic = useCallback(() => {
+    if (currentSlide >= itemsPerPage) {
+      setCurrentSlide(prev => prev - itemsPerPage);
     } else {
-      setCurrentSlide(product.length - (product.length % 3 || 3));
+      setCurrentSlide(
+        Math.max(
+          musicList.length - (musicList.length % itemsPerPage || itemsPerPage),
+          0
+        )
+      );
     }
-  };
+  }, [currentSlide, musicList.length]);
 
-  const product = [
-    {
-      image: "https://makemebeat.net/wp-content/uploads/2020/11/2221212.jpg",
-      title: "روزبه قائم",
-      description: "خواننده,آهنگساز,تنظیم کننده,میکس من",
-      rate: "5.0",
-      price: "150000",
-    },
-    {
-      image:
-        "https://makemebeat.net/wp-content/uploads/2022/09/WhatsApp%20Image%202022-09-10%20at%2012.16.39%20PM.jpeg",
-      title: "آبتین",
-      description: "کارگردان",
-      rate: "1.5",
-      price: "150000",
-    },
-    {
-      image:
-        "https://makemebeat.net/wp-content/uploads/2023/01/%D9%85%D8%AC%D8%AA%D8%A8%DB%8C-%D8%AA%D9%82%DB%8C-%D9%BE%D9%88%D8%B1.png",
-      title: "مجتبی تقی پور",
-      description: "آهنگساز,خواننده,نوازنده",
-      rate: "3.0",
-      price: "150000",
-    },
-    {
-      image: "https://makemebeat.net/wp-content/uploads/2022/07/M-Namdar.png",
-      title: "محسن نامدار",
-      description: "آهنگساز,تنظیم کننده,میکس من",
-      rate: "4.0",
-      price: "150000",
-    },
-    {
-      image: "https://makemebeat.net/wp-content/uploads/2022/06/unnamed.jpg",
-      title: "پویا صفا",
-      description: "آهنگساز,تنظیم کننده,میکس من",
-      rate: "5.0",
-      price: "150000",
-    },
-    {
-      image:
-        "https://makemebeat.net/wp-content/uploads/2022/05/274224342_224286739917884_5050267142920397498_n.jpg",
-      title: "محمد سیحونی",
-      description: "تهییه کننده,نویسنده,کارگردان,تدوین گر",
-      rate: "3.5",
-      price: "150000",
-    },
-    {
-      image:
-        "https://makemebeat.net/wp-content/uploads/2023/02/Amin_Captive-800x600.jpg",
-      title: "Amin Captive",
-      description: "کارگردان,گرافیست",
-      rate: "4.0",
-      price: "150000",
-    },
-    {
-      image:
-        "https://makemebeat.net/wp-content/uploads/2023/06/IMG_20230519_165431_468-400x400.jpg",
-      title: "علی سونار ",
-      description: "آهنگ ساز,تنظیم کننده,میکس من",
-      rate: "4.0",
-      price: "150000",
-    },
-  ];
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <div className="grid grid-cols-12 gap-2 justify-between  place-content-center ">
-        <div className="col-span-1 ">
-          <div className="grid justify-items-end  items-center h-full w-full">
-            <MdArrowCircleLeft
-              color="gray"
-              style={{ cursor: "pointer" }}
-              size={40}
-              onClick={handelPervIndexPic}
-            />
-          </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-12 gap-4 items-center">
+        <div className="col-span-1 flex justify-end">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handelPervIndexPic}
+            className="p-1 rounded-full focus:outline-none"
+            aria-label="Previous"
+          >
+            <MdArrowCircleLeft color="gray" size={40} />
+          </motion.button>
         </div>
 
         <div className="col-span-10">
-          <div className={`mt-5 p-3 grid grid-cols-3 gap-2`}>
-            {/* {musicList.slice(currentSlide, currentSlide + 3).map((a, i) => ( */}
-            {musicList.map((a, i) => (
-              <div
-                key={i}
-                className={`w-full col max-w-sm 
-                
-                  border border-gray-600 rounded-lg shadow-sm bg-zinc-950`}
+          <div className="relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 0.5 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
               >
-                <div className="flex gap-2 m-2 text-xl">
-                <RiDiscountPercentLine size={35} fontSize={10} title="تخفیف"/>
-                {a.discountPriceTanzim} تومان 
-                </div>
-                <img
-                  // alt={a.title}
-                  className="p-2 rounded-xl h-72 w-full"
-                  src={FinalUrl+a.file_path.replace(/\\/g, "/")}
-                />
-                <div className="px-2 pb-2 ">
-                  <div className="justify-items-end">
-                    <div className="text-xl mb-2 font-semibold tracking-tight text-gray-900 dark:text-stone-300 ">
-                     آرتیست : {a.artistName}
+                {musicList.slice(currentSlide, currentSlide + itemsPerPage).map((a, i) => (
+                  <motion.div
+                    key={`${a.id}-${i}`}
+                    whileHover={{ y: -5 }}
+                    className="bg-zinc-950 border border-gray-700 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl"
+                  >
+                    {a.discountPriceTanzim ===null? (
+                        
+                       <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-red-900 to-red-700 text-white">تخفیف ندارد</div>  
+                        )
+                        :
+                        (<div className="flex items-center gap-2 p-3 bg-gradient-to-r from-red-900 to-red-700 text-white">
+                        <RiDiscountPercentLine size={24} />
+                        <span className="font-medium">
+                          {parseFloat(a.discountPriceTanzim).toLocaleString()} تومان تخفیف
+                        </span>
+                      </div>
+                    )
+                  }
+                    
+                    <div className="relative h-72 w-full overflow-hidden">
+                      <LazyLoadImage
+                        alt={a.title}
+                        src={!a.file_pathImage ? "12-1024x745-1-5.png" : FinalUrl + a.file_pathImage}
+                        effect="opacity"
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                        placeholderSrc="/placeholder-music.jpg"
+                      />
+                      <button
+                        onClick={() => {
+                          dispatch(showMusicplayer(true));
+                          dispatch(fetchurlMuiscFile(a));
+                        }}
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70 transition-all"
+                      >
+                        <PlayCircleOutlineIcon className="text-white text-lg" />
+                      </button>
                     </div>
-                    <div className="text-lg mb-2 font-semibold tracking-tight text-gray-900 dark:text-stone-300 ">
-                    نام موزیک :  {a.title}
-                    </div>
-                    <div className="text-sm font-semibold tracking-tight text-gray-900 dark:text-stone-300">
-                      {a.tozihat}
-                    </div>
-                  </div>
-                  <div className="flex mt-2.5 mb-2.5">
-                    <div className="space-x-1 ">
-                    <div className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-sm ms-2">
-                        <div className="">{a.rate}</div>
-                        <div className="">امتیاز کاربران</div>
+
+                    <div className="p-4">
+                      <h3 className="text-xl font-bold text-gray-200 mb-1 truncate">{a.artistName}</h3>
+                      <h4 className="text-lg text-gray-300 mb-2 truncate">{a.title}</h4>
+                      <p className="text-gray-400 text-sm mb-4 line-clamp-2">{a.tozihat}</p>
+
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
+                          <div>{a.rate}</div>
+                          <div>امتیاز کاربران</div>
+                        </div>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Rating
+                            name="text-feedback"
+                            value={a.sheromelody}
+                            readOnly
+                            precision={0.5}
+                            emptyIcon={
+                              <StarIcon style={{ opacity: 0.55, color: "yellow",whitesmoke:"", fontSize:"inherit"}}  />
+                            }
+                          />
+                        </Box>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4">
+                        <span className="text-lg font-bold text-white">
+                          {a.orginalPriceTanzim === null 
+                            ? "قیمتی درج نشده" 
+                            : `${parseFloat(a.orginalPriceTanzim).toLocaleString()} تومان`}
+                        </span>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            dispatch(getOneMusicInfo(musicList[currentSlide + i]));
+                            navigate('/product');
+                          }}
+                          className="px-4 py-2 bg-black hover:bg-green-700  text-white font-medium rounded-lg transition-colors"
+                        >
+                          انتخاب
+                        </motion.button>
                       </div>
                     </div>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Rating
-                          name="text-feedback"
-                          value={a.sheromelody}
-                          readOnly
-                          precision={0.5}
-                          emptyIcon={
-                            <StarIcon
-                              style={{ opacity: 0.55,color:"whitesmoke" }}
-                              fontSize="inherit"
-                            />
-                          }
-                        />
-                      </Box>
-                   
-                  </div>
-                  <div dir="rtl" className="flex items-center ">
-                    <span className=" font-bold text-gray-900 dark:text-white">
-                      قیمت : {a.orginalPriceTanzim === null?"":a.orginalPriceTanzim}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-1 m-1">
-                    <button
-                      onClick={()=>{dispatch(getOneMusicInfo(musicList[i]));navigate('/product')}
-                      }
-                      className="h-14 w-14 bg-zinc-900 text- base text-center text-blue-300 font-semibold rounded-lg"
-                    >
-                      انتخاب
-                    </button>
-                      <PlayCircleOutlineIcon size={25}  className="text-cyan-50"
-                      onClick={()=>{dispatch(showMusicplayer(true));dispatch(fetchurlMuiscFile(a))}}/>
-                  </div>
-                </div>
-              </div>
-            ))}
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
-        <div className="col-span-1">
-          <div className="grid justify-items-start items-center h-full w-full">
-            <MdArrowCircleRight
-              color="gray"
-              style={{ cursor: "pointer" }}
-              size={40}
-              onClick={handelNextIndexPic}
-            />
-          </div>
+
+        <div className="col-span-1 flex justify-start">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handelNextIndexPic}
+            className="p-1 rounded-full focus:outline-none"
+            aria-label="Next"
+          >
+            <MdArrowCircleRight color="gray" size={40} />
+          </motion.button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

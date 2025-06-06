@@ -16,7 +16,9 @@ const Product = () => {
           <div className="">
           <MainSection OneMusicInfo={OneMusicInfo}/>
           </div>
+          <div>
           <LikeGenere OneMusicInfo={OneMusicInfo}/>
+          </div>
         </div>
         </div>
         <div className="col-span-10 rounded-xl row-span-1 bg-gray-900">

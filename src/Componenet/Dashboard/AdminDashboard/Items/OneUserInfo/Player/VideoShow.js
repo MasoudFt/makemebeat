@@ -10,8 +10,9 @@ const VideoShow = ({ url, thumbnail }) => {
           "http://localhost:3000/uploads/videos/demoVideofile-1748607121287-169446406.mp4"
         }
         controls
-        width="25%"
-        height="25%"
+        style={{padding:"3%",borderRadius:"5%"}}
+        width="100%"
+        height="100%"
         light={thumbnail || false} // نمایش تامبنیل به عنوان تصویر پیش‌نمایش اگر موجود باشد
         playIcon={
           <button className="bg-purple-700 text-white p-4 rounded-full shadow-lg hover:bg-purple-800">

@@ -38,6 +38,7 @@ const Pop = ({Component}) => {
     primaryAmount: "",
     discountAmount: "",
   });
+  console.log(inputValues)
   const [formData, setFormData] = useState({
     message: "",
     gammuisc: "",
