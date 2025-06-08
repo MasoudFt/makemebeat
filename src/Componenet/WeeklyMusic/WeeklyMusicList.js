@@ -28,6 +28,7 @@ const WeeklyMusicList = () => {
       const url = `http://localhost:3000/musics`;
       const res = await axios.get(url);
       setMusicList(res.data);
+      console.log(res.data)
     } catch (error) {
       console.log(error.response);
     } finally {

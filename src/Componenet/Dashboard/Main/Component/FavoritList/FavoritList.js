@@ -71,12 +71,6 @@ const Wishlist = ({ items }) => {
   );
 };
 
-// Example usage:
-{/* <Wishlist 
-  items={[
-    { id: 1, name: 'هدفون بی‌سیم مدل X200', price: 1200000, image: '/headphone.jpg', inStock: true },
-    { id: 2, name: 'ماوس گیمینگ مدل Pro', price: 850000, image: '/mouse.jpg', inStock: false }
-  ]} 
-/> */}
+
 
 export default Wishlist;

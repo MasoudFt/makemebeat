@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { fetchImage } from "../../../../../StateManagement/Action";
-import { MdArrowCircleLeft } from "react-icons/md";
 
-import { MdArrowCircleRight } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
 const MusicList = () => {
-  const userInfo = useSelector((state) => state.userId);
   const [musicList,setMusicList]=useState([]);
   const [newUrls, setNewUrls] = useState([]);
   const [error, setError] = useState("");
@@ -88,11 +83,12 @@ const ButtonClassName ="rounded-xl text-white text-xl h-12 font-semibold bg-blac
         </div>
       </div>
       {
-        musicList.length>=6?
+        musicList.length<6 || musicList.length>=6?
         <div className="flex justify-center">
        
         <input onClick={()=>setNumber(2)}name="1" type="radio" className="text-purple-700 p-1 m-1"/>
         <input onClick={()=>setNumber(1)}name="1" type="radio" className="text-purple-700 p-1 m-1"/>
+        <input onClick={()=>setNumber(3)}name="1" type="radio" className="text-purple-700 p-1 m-1"/>
     
         </div>
         :
