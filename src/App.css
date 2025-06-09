@@ -52,3 +52,26 @@
   scrollbar-width: thin; /* Make scrollbar thin */
   scrollbar-color: #6b5b95 rgba(0, 0, 0, 0.1); /* Thumb color and track color */
 }
+.custom-scroll::-webkit-scrollrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: rgba(75, 0, 130, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #6b5b95;
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #8e7cc3;
+}
+
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #6b5b95 rgba(75, 0, 130, 0.1);
+}

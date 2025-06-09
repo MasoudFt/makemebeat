@@ -7,19 +7,27 @@ export const login = (email, password) => {
         email,
         password,
       });
+      
+      // ذخیره وضعیت ادمین در localStorage
+      if (email === "Admin@gmail.com") {
+        localStorage.setItem("isAdmin", "true");
+      } else {
+        localStorage.setItem("isAdmin", "false");
+      }
+
       dispatch({ type: "LOGIN_SUCCESS", payload: response.data });
       localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("username", response.data.username);
       localStorage.setItem("userId", response.data.userId);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.token}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
       dispatch(getUserId(response.data));
     } catch (error) {
       dispatch({ type: "LOGIN_FAILURE", payload: "Invalid email or password" });
     }
   };
 };
+
+
 
 export const logout = (dispatch) => {
   return (dispatch) => {

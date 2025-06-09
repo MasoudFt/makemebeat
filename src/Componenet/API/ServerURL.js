@@ -1,5 +1,5 @@
 const ServerURL = () => {
-  return  'http://localhost:3000/'
+  return  'https://makemebeatplus.liara.run/'
 }
 
 export default ServerURL

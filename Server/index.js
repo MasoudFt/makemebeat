@@ -99,10 +99,14 @@ app.put("/users/update/:userId", upload2.single('image'), async (req, res) => {
   }
 });
 
+
+
+
 // ورود کاربر
 app.post("/users/login", async (req, res) => {
   const { email, password } = req.body;
-
+console.log(email)
+console.log(password)
   try {
     const connection = await pool.getConnection();
     const [results] = await connection.query("SELECT * FROM users WHERE email = ?", [email]);
