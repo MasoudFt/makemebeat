@@ -1,14 +1,14 @@
 const express = require("express");
-const mysql = require("mysql2/promise")
+const mysql = require("mysql2/promise");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const fs = require('fs');
+const fs = require("fs");
 const dotenv = require("dotenv");
-dotenv.config()
+dotenv.config();
 
 const app = express();
 const port = 3000;
@@ -20,10 +20,9 @@ app.use(cors());
 const uploadMusic = multer({ dest: "uploads/musics" });
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); 
+    cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    console.log("fileStrorage:",file)
     const ext = path.extname(file.originalname);
     const filename = `${Date.now()}${ext}`; // ایجاد نام منحصر به فرد برای فایل
     cb(null, filename);
@@ -33,32 +32,12 @@ const upload2 = multer({ storage });
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// ایجاد pool برای مدیریت اتصالات
+const pool = mysql.createPool({
+  uri:process.env.MYSQL2_URI
+});
 
-// const db = mysql.createConnection({
-//     host: "localhost",
-//     port: 3306,
-//     user: "root",
-//     password: "Mat@123456@",
-//   });
-  
-
-async function connectDatabase() {
-  const db = await mysql.createConnection({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-  });
-  
-  console.log('Connected to the database.');
-
-  return db;
-}
-
-const db = connectDatabase();
-
-
+// ثبت نام کاربر
 app.post("/users/register", async (req, res) => {
   const {
     username,
@@ -71,40 +50,33 @@ app.post("/users/register", async (req, res) => {
   } = req.body;
 
   try {
-    // هش کردن رمز عبور
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // تعیین نوع خریدار و فروشنده
+    
+    // تعیین خریدار و فروشنده
     const buyer = type === true || type === "true" ? 1 : 0;
     const seller = !buyer ? 1 : 0;
 
     const query = `
       INSERT INTO users (username, email, password, mobilePhone, name, family, buyer, seller, profile_path) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL) 
-    `; // فیلد profile_path به عنوان NULL
+    `;
 
-    // اجرای کوئری
-    db.query(query, [username, email, hashedPassword, mobile, name, family, buyer, seller], (err) => {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          return res.status(400).send({ message: "User already exists" });
-        }
-        return res.status(500).send(err);
-      }
-      res.send("User created successfully");
-    });
+    const connection = await pool.getConnection(); // دریافت یک اتصال
+    await connection.query(query, [username, email, hashedPassword, mobile, name, family, buyer, seller]);
+    connection.release(); // آزاد کردن اتصال
+
+    res.send("User created successfully");
   } catch (error) {
-    console.error('Error during registration:', error); // ثبت خطا در کنسول
+    console.error('Error during registration:', error);
     res.status(500).send({ message: "Server error" });
   }
 });
 
-
+// به روزرسانی پروفایل کاربر
 app.put("/users/update/:userId", upload2.single('image'), async (req, res) => {
   const userId = req.params.userId;
   let profilePath = req.file ? req.file.path : null; // مسیر عکس بارگذاری شده
 
-  // اگر هیچ عکسی بارگذاری نشده باشد، باید از به‌روزرسانی صرف‌نظر کنیم
   if (!profilePath) {
     return res.status(400).send({ message: "No image uploaded" });
   }
@@ -112,545 +84,435 @@ app.put("/users/update/:userId", upload2.single('image'), async (req, res) => {
   const query = `UPDATE users SET profile_path = ? WHERE userID = ?`;
 
   try {
-    // استفاده از Promise برای db.query
-    const result = await new Promise((resolve, reject) => {
-      db.query(query, [profilePath, userId], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+    const connection = await pool.getConnection();
+    const [result] = await connection.query(query, [profilePath, userId]);
+    connection.release();
 
-    // بررسی اینکه آیا کاربر به‌روزرسانی شده است یا خیر
     if (result.affectedRows === 0) {
-      return res.status(404).send({ message: "User  not found" });
+      return res.status(404).send({ message: "User not found" });
     }
 
-    res.send("User  updated successfully");
+    res.send("User updated successfully");
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).send({ message: "Server error" });
   }
 });
 
-
-const JWT_SECRET = "your_jwt_secret";
-// console.log("JWT_SECRET",JWT_SECRET)
-
-// Middleware for authentication
-const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  console.log("authHeader :",authHeader)
-  if (authHeader) {
-    const token = authHeader.split(" ")[1]; // استخراج توکن از هدر
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) {
-        console.error('Token verification error:', err);
-        return res.sendStatus(403); 
-      }
-      req.user = user; 
-      next();
-    });
-  } else {
-    res.sendStatus(401); // Unauthorized
-  }
-};
-
-
 // ورود کاربر
 app.post("/users/login", async (req, res) => {
   const { email, password } = req.body;
-  db.query(
-    "SELECT * FROM users WHERE email = ?",
-    [email],
-    async (err, results) => {
-      if (err) {
-        return res.status(500).send("Internal Server Error");
-      }
-      if (results.length === 0) {
-        return res.status(401).send("User  not found");
-      }
-      const user = results[0];
-      const match = await bcrypt.compare(password, user.password);
-      if (!match) {
-        return res.status(401).send("Invalid credentials");
-      }
-      // ایجاد توکن JWT
-      const token = jwt.sign({ userID: user.userID }, JWT_SECRET, {
-        expiresIn: "7D",
-      });
-      res.json({ token, userId: user.userID, username: user.username });
+
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query("SELECT * FROM users WHERE email = ?", [email]);
+    connection.release();
+
+    if (results.length === 0) {
+      return res.status(401).send("User not found");
     }
-  );
-});
-
-
-
-// خواندن تمام کاربرها (Protected Route)
-app.get("/users", (req, res) => {
-  db.query("SELECT * FROM users", (err, results) => {
-    if (err) {
-      return res.status(500).send("Internal Server Error");
+    const user = results[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).send("Invalid credentials");
     }
-    res.json(results);
-  });
-});
-
-
-//خواندن تک کاربر
-app.get("/users/:id", (req, res) => {
-  const userId = req.params.id; // استفاده از پارامتر id از URL
-  db.query(
-    "SELECT userID, username, name,password ,mobilePhone,email ,stadioAddress, buyer, seller,profile_path ,createdAt, artist, tozihat FROM users WHERE userID = ?",
-    [userId],
-    (err, results) => {
-      if (err) {
-        return res.status(500).send("Internal Server Error");
-      }
-      if (results.length === 0) {
-        return res.status(404).send("User  not found");
-      }
-      res.json(results[0]);
-    }
-  );
-});
-
-
-
-
-app.post("/musics",
-  uploadMusic.fields([
-    { name: "productImage", maxCount: 1 },
-    { name: "coverImage", maxCount: 1 },
-    { name: "demoMP3File", maxCount: 1 },
-    { name: "mainMP3File", maxCount: 1 },
-    { name: "tagMP3", maxCount: 1 },
-    { name: "waveFile", maxCount: 1 },
-    { name: "projectFile", maxCount: 1 }
-  ]),
-  (req, res) => {
-    // console.log("Request Files:", req.files);
-    // console.log("Request Body:", req.body);
-
-    const {
-      user_id,
-      productName: title,
-      createat,
-      view,
-      likeproduct,
-      post_id,
-      sheroMelody,
-      tanzim,
-      sampleproduct,
-      type,
-      gener,
-      gammuisc,
-      tempo,
-      productDescription: tozihat,
-      primaryAmount: orginalPriceTanzim,
-      discountAmount: discountPriceTanzim,
-    } = req.body;
-
-    // بررسی و تعیین مسیر فایل‌ها
-    const file_pathImage = req.files.productImage?.[0]?.path || null; // مسیر تصویر محصول
-    const file_typeImage = req.files.productImage?.[0]?.mimetype || null; // نوع تصویر محصول
-    const file_pathMP3demo = req.files.demoMP3File?.[0]?.path || null; // مسیر فایل دمو
-    const file_typeMP3demo = req.files.demoMP3File?.[0]?.mimetype || null; // نوع فایل دمو
-    const file_pathMP3Orginal = req.files.mainMP3File?.[0]?.path || null; // مسیر فایل اصلی
-    const file_typeMP3Orginal = req.files.mainMP3File?.[0]?.mimetype || null; // نوع فایل اصلی
-    const file_pathtagMP3 = req.files.tagMP3?.[0]?.path || null; // مسیر فایل تگ
-    const file_typeTagMP3 = req.files.tagMP3?.[0]?.mimetype || null; // نوع فایل تگ
-    const file_pathWave = req.files.waveFile?.[0]?.path || null; // مسیر فایل wave
-    const file_typeWave = req.files.waveFile?.[0]?.mimetype || null; // نوع فایل wave
-    const file_pathProjectLine = req.files.projectFile?.[0]?.path || null; // مسیر فایل پروژه
-    const file_typeProjectLine = req.files.projectFile?.[0]?.mimetype || null; // نوع فایل پروژه
-    const file_pathCoverSample = req.files.coverImage?.[0]?.path || null; // مسیر کاور نمونه
-    const file_typeCoverSample = req.files.coverImage?.[0]?.mimetype || null; // نوع کاور نمونه
-    const isShow=0
-    // کوئری INSERT
-    db.query(
-      `INSERT INTO musics 
-      (user_id, title, file_typeImage, file_pathImage, cover_path, createat, view, likeproduct, post_id, isShow,
-       sheroMelody, tanzim, sampleproduct, type, gener, gammuisc, tempo, tozihat, 
-       file_pathMP3demo, file_typeMP3demo, file_pathMP3Orginal, file_typeMP3Orginal, 
-       file_pathtagMP3, file_typeTagMP3, file_pathWave, file_typeWave,
-       file_pathProjectLine, file_typeProjectLine, orginalPriceTanzim, discountPriceTanzim, 
-       file_pathCoverSample, file_typeCoverSample) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        user_id || null,
-        title || null,
-        file_typeImage,
-        file_pathImage,
-        file_pathCoverSample,
-        createat || null,
-        view || null,
-        likeproduct || null,
-        post_id || null,
-        isShow,
-        sheroMelody || 0,
-        tanzim || 0,
-        sampleproduct || 0,
-        type || null,
-        gener || null,
-        gammuisc || null,
-        tempo || null,
-        tozihat || null,
-        file_pathMP3demo,
-        file_typeMP3demo,
-        file_pathMP3Orginal,
-        file_typeMP3Orginal,
-        file_pathtagMP3,
-        file_typeTagMP3,
-        file_pathWave,
-        file_typeWave,
-        file_pathProjectLine,
-        file_typeProjectLine,
-        orginalPriceTanzim || null,
-        discountPriceTanzim || null,
-        file_pathCoverSample,
-        file_typeCoverSample,
-      ],
-      (err) => {
-        if (err) {
-          console.error("Error inserting data:", err);
-          return res.status(500).send("Error uploading music.");
-        }
-        res.send({ status: 201, message: "بارگذاری موسیقی با موفقیت انجام شد" });
-      }
-    );
+    const token = jwt.sign({ userID: user.userID }, process.env.JWT_SECRET, { expiresIn: "7D" });
+    res.json({ token, userId: user.userID, username: user.username });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).send("Internal Server Error");
   }
-);
+});
 
-app.get('/download/:id', (req, res) => {
+// خواندن تمام کاربران
+app.get("/users", async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query("SELECT * FROM users");
+    connection.release();
+    res.json(results);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// خواندن تک کاربر
+app.get("/users/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query("SELECT userID, username, name, mobilePhone, email, buyer, seller, profile_path, createdAt FROM users WHERE userID = ?", [userId]);
+    connection.release();
+
+    if (results.length === 0) {
+      return res.status(404).send("User not found");
+    }
+
+    res.json(results[0]);
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// بارگذاری موزیک
+app.post("/musics", uploadMusic.fields([
+  { name: "productImage", maxCount: 1 },
+  { name: "coverImage", maxCount: 1 },
+  { name: "demoMP3File", maxCount: 1 },
+  { name: "mainMP3File", maxCount: 1 },
+  { name: "tagMP3", maxCount: 1 },
+  { name: "waveFile", maxCount: 1 },
+  { name: "projectFile", maxCount: 1 }
+]), async (req, res) => {
+  const {
+    user_id,
+    productName: title,
+    createat,
+    view,
+    likeproduct,
+    post_id,
+    sheroMelody,
+    tanzim,
+    sampleproduct,
+    type,
+    gener,
+    gammuisc,
+    tempo,
+    productDescription: tozihat,
+    primaryAmount: orginalPriceTanzim,
+    discountAmount: discountPriceTanzim,
+  } = req.body;
+
+  const file_pathImage = req.files.productImage?.[0]?.path || null;
+  const file_pathCoverSample = req.files.coverImage?.[0]?.path || null;
+
+  const query = `
+    INSERT INTO musics 
+    (user_id, title, file_pathImage, cover_path, createat, view, likeproduct, post_id, sheroMelody, tanzim, sampleproduct, type, gener, gammuisc, tempo, tozihat, orginalPriceTanzim, discountPriceTanzim) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  try {
+    const connection = await pool.getConnection();
+    await connection.query(query, [
+      user_id || null,
+      title || null,
+      file_pathImage,
+      file_pathCoverSample,
+      createat || null,
+      view || null,
+      likeproduct || null,
+      post_id || null,
+      sheroMelody || 0,
+      tanzim || 0,
+      sampleproduct || 0,
+      type || null,
+      gener || null,
+      gammuisc || null,
+      tempo || null,
+      tozihat || null,
+      orginalPriceTanzim || null,
+      discountPriceTanzim || null
+    ]);
+    connection.release();
+    res.send({ status: 201, message: "بارگذاری موسیقی با موفقیت انجام شد" });
+  } catch (err) {
+    console.error("Error inserting music:", err);
+    return res.status(500).send("Error uploading music.");
+  }
+});
+
+// دانلود فایل موزیک بر اساس ID
+app.get('/download/:id', async (req, res) => {
   const fileId = req.params.id;
 
-  // کوئری برای یافتن اطلاعات مربوط به فایل در دیتابیس بر اساس ID
-  db.query(
-    `SELECT 
-        m.title, 
-        u.username AS artistName, 
-        m.likeproduct, 
-        m.type, 
-        m.gener, 
-        m.file_typeImage, 
-        m.orginalPriceTanzim, 
-        m.tempo,
-        m.post_id,
-        m.tozihat,
-        m.file_pathMP3Orginal, 
-        m.file_typeMP3demo, 
-        m.file_typeMP3Orginal, 
-        m.file_typetagMP3, 
-        m.file_typeWave, 
-        m.file_typeProjectLine, 
-        m.file_typeCoverSample,
-        m.view,
-        m.sampleproduct,
-        m.tanzim,
-        m.sheroMelody,
-        m.gammuisc 
-     FROM 
-        musics m
-     JOIN 
-        users u 
-     ON 
-        m.user_id = u.userID
-     WHERE 
-        m.post_id = ?`, 
-    [fileId],
-    (err, results) => {
-      if (err) {
-        console.error('Error retrieving file data from database:', err);
-        return res.status(500).send('Error retrieving file data.');
-      }
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(`
+      SELECT 
+          m.title, 
+          m.file_pathMP3Orginal, 
+          m.file_typeMP3Orginal 
+       FROM 
+          musics m
+       WHERE 
+          m.post_id = ?`, 
+    [fileId]);
+    connection.release();
 
-      if (results.length === 0) {
-        return res.status(404).send('File not found.');
-      }
-
-      const file = results[0];
-      const filePath = path.join(__dirname, file.file_pathMP3Orginal);
-      const fileExtension = path.extname(file.file_pathMP3Orginal); // اصلاح شده
-      console.log("file,", file);
-      console.log("fileExtension,", fileExtension);
-      let contentType = 'application/octet-stream'; // نوع پیش‌فرض، برای فایل‌های ناشناخته
-
-      switch (fileExtension) {
-        case '.mp3':
-          contentType = 'audio/mpeg';
-          break;
-        case '.wav':
-          contentType = 'audio/wav';
-          break;
-        // می‌توانید انواع بیشتری اضافه کنید
-        default:
-          contentType = 'application/octet-stream';
-      }
-      
-      // تنظیم نوع محتوا
-      res.setHeader('Content-Type', contentType);
-
-      // دانلود فایل با نام صحیح
-      const downloadFileName = `${file.title}${fileExtension}`; // نام فایل با پسوند
-      res.download(filePath, downloadFileName, (err) => {
-        if (err) {
-          console.error('Error downloading the file:', err);
-          res.status(500).send('Error downloading the file.');
-        }
-      });
+    if (results.length === 0) {
+      return res.status(404).send('File not found.');
     }
-  );
+
+    const file = results[0];
+    const filePath = path.join(__dirname, file.file_pathMP3Orginal);
+    const fileExtension = path.extname(file.file_pathMP3Orginal);
+    let contentType = 'application/octet-stream';
+
+    switch (fileExtension) {
+      case '.mp3':
+        contentType = 'audio/mpeg';
+        break;
+      case '.wav':
+        contentType = 'audio/wav';
+        break;
+      default:
+        contentType = 'application/octet-stream';
+    }
+    
+    res.setHeader('Content-Type', contentType);
+    const downloadFileName = `${file.title}${fileExtension}`;
+    res.download(filePath, downloadFileName);
+  } catch (err) {
+    console.error('Error retrieving file data:', err);
+    return res.status(500).send('Error retrieving file data.');
+  }
 });
 
-app.get("/musics/like/:type", (req, res) => {
+
+// روت برای دریافت موزیک‌ها بر اساس نوع
+app.get("/musics/like/:type", async (req, res) => {
   const type = req.params.type;
 
   if (!type) {
     return res.status(400).send("لطفاً ژانر را مشخص کنید.");
   }
 
-  db.query(
-    `SELECT 
-        m.title, 
-        u.username AS artistName, 
-        m.likeproduct, 
-        m.type, 
-        m.gener, 
-        m.post_id, 
-        m.file_pathImage, 
-        m.file_pathtagMP3, 
-        m.file_pathMP3Orginal, 
-				m.orginalPriceTanzim, 
-				m.tempo,
-				m.tozihat,
-				discountPriceTanzim,
-        view,
-        sampleproduct,
-        tanzim,
-        sheroMelody,
-        m.gammuisc 
-     FROM 
-        musics m
-     JOIN 
-        users u 
-     ON 
-        m.user_id = u.userID WHERE type LIKE ?`,
-    [`%${type}%`], // جستجو با استفاده از LIKE برای پیدا کردن ژانرهای مرتبط
-    (err, results) => {
-      if (err) {
-        return res.status(500).send("خطا در اجرای کوئری: " + err);
-      }
-      if (results.length === 0) {
-        return res.status(404).send("سبک مشابه ای  پیدا نشد.");
-      }
-      res.json(results);
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(
+      `SELECT 
+          m.title, 
+          u.username AS artistName, 
+          m.likeproduct, 
+          m.type, 
+          m.gener, 
+          m.post_id, 
+          m.file_pathImage, 
+          m.file_pathtagMP3, 
+          m.file_pathMP3Orginal, 
+          m.orginalPriceTanzim, 
+          m.tempo,
+          m.tozihat,
+          m.discountPriceTanzim,
+          m.view,
+          m.sampleproduct,
+          m.tanzim,
+          m.sheroMelody,
+          m.gammuisc 
+       FROM 
+          musics m
+       JOIN 
+          users u ON m.user_id = u.userID 
+       WHERE 
+          m.type LIKE ?`, [`%${type}%`] // جستجو با استفاده از LIKE
+    );
+    connection.release();
+
+    if (results.length === 0) {
+      return res.status(404).send("سبک مشابه ای  پیدا نشد.");
     }
-  );
+
+    res.json(results);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    return res.status(500).send("خطا در اجرای کوئری");
+  }
 });
 
+// خواندن همه موزیک‌ها
+app.get("/musics", async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(
+      `SELECT 
+          m.title, 
+          u.username AS artistName, 
+          m.likeproduct, 
+          m.type, 
+          m.gener, 
+          m.file_pathImage, 
+          m.orginalPriceTanzim, 
+          m.tempo,
+          m.post_id,
+          m.tozihat, 
+          m.file_pathtagMP3, 
+          m.file_pathMP3Orginal, 
+          m.discountPriceTanzim,
+          m.view,
+          m.sampleproduct,
+          m.tanzim,
+          m.sheroMelody,
+          m.gammuisc 
+       FROM 
+          musics m
+       JOIN 
+          users u ON m.user_id = u.userID`
+    );
+    connection.release();
 
-app.get("/musics", (req, res) => {
-  db.query(
-    `SELECT 
-        m.title, 
-        u.username AS artistName, 
-        m.likeproduct, 
-        m.type, 
-        m.gener, 
-        m.file_pathImage, 
-				m.orginalPriceTanzim, 
-				m.tempo,
-				m.post_id,
-				m.tozihat, 
-        m.file_pathtagMP3, 
-        m.file_pathMP3Orginal, 
-				discountPriceTanzim,
-        view,
-        sampleproduct,
-        tanzim,
-        sheroMelody,
-        m.gammuisc 
-     FROM 
-        musics m
-     JOIN 
-        users u 
-     ON 
-        m.user_id = u.userID`
-    , (err, results) => {
-    if (err) return res.status(500).send(err);
-
-    // باید مسیر فایل را تبدیل کنیم تا به درستی قابل دسترسی باشد
     const musicList = results.map((music) => ({
       ...music,
-      // file_path: `http://localhost:3000/${music.file_path}`, // اضافه کردن آدرس کامل
+      // اگر نیاز است که مسیر فایل را به آدرس کامل اضافه کنید، این خط را uncomment کنید
+      // file_path: `http://localhost:3000/${music.file_path}`,
     }));
 
     res.json(musicList);
-  });
+  } catch (error) {
+    console.error('Error fetching musics:', error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
-
-app.get("/musics/:page", (req, res) => {
+// خواندن موزیک‌ها با pagination
+app.get("/musics/:page", async (req, res) => {
   const page = parseInt(req.params.page);
-  const limit = 6; 
+  const limit = 6;
   const offset = (page - 1) * limit;
 
-  db.query("SELECT * FROM musics LIMIT ? OFFSET ?", [limit, offset], (err, results) => {
-    if (err) return res.status(500).send(err);
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query("SELECT * FROM musics LIMIT ? OFFSET ?", [limit, offset]);
+    connection.release();
 
-    // باید مسیر فایل را تبدیل کنیم تا به درستی قابل دسترسی باشد
+    const musicList = results.map((music) => ({
+      ...music,
+      file_path: `http://localhost:3000/${music.file_path}`, // اضافه کردن آدرس کامل در صورت نیاز
+    }));
+
+    res.json(musicList);
+  } catch (err) {
+    console.error('Error fetching paginated musics:', err);
+    return res.status(500).send(err);
+  }
+});
+
+// جستجو بر اساس id یا filePath موزیک‌ها
+app.get("/musics/:idOrFilePath/:page/", async (req, res) => {
+  const idOrFilePath = req.params.idOrFilePath;
+  const page = parseInt(req.params.page) || 1;
+  const limit = 6;
+  const offset = (page - 1) * limit;
+
+  try {
+    const connection = await pool.getConnection();
+
+    if (/^\d+$/.test(idOrFilePath)) {
+      const [results] = await connection.query(
+        "SELECT * FROM musics WHERE user_id = ? LIMIT ? OFFSET ?",
+        [idOrFilePath, limit, offset]
+      );
+
+      if (results.length === 0)
+        return res.status(404).send("محصولی ایجاد نشده به صفحه ی ایجاد محصول بروید");
+      
+      res.json(results);
+    } else {
+      const filePath = `uploads/${idOrFilePath}`;
+      const [results] = await connection.query(
+        "SELECT * FROM musics WHERE file_path = ? LIMIT ? OFFSET ?",
+        [filePath, limit, offset]
+      );
+
+      if (results.length === 0) {
+        return res.status(404).send("No results found.");
+      } else {
+        res.json(results);
+      }
+    }
+    connection.release();
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).send("Error executing query");
+  }
+});
+
+// روت برای دریافت موزیک‌ها با نام آرتیست
+app.get("/music/joinmusic", async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(
+      `SELECT 
+          m.title, 
+          u.username AS artistName, 
+          m.likeproduct, 
+          m.type, 
+          m.gener, 
+          m.file_path, 
+          m.file_pathtagMP3, 
+          m.orginalPriceTanzim, 
+          m.tempo,
+          m.tozihat,
+          m.discountPriceTanzim,
+          m.view,
+          m.sampleproduct,
+          m.tanzim,
+          m.sheroMelody,
+          m.gammuisc 
+      FROM 
+          musics m
+      JOIN 
+          users u ON m.user_id = u.userID`
+    );
+    connection.release();
+
     const musicList = results.map((music) => ({
       ...music,
       file_path: `http://localhost:3000/${music.file_path}`, // اضافه کردن آدرس کامل
     }));
 
     res.json(musicList);
-  });
-});
-
-
-app.get("/musics/:idOrFilePath/:page/", (req, res) => {
-  const idOrFilePath = req.params.idOrFilePath;
-  const page = parseInt(req.params.page) || 1;
-  const limit =  6; 
-  const offset = (page - 1) * limit; 
-
-  if (/^\d+$/.test(idOrFilePath)) {
-    db.query(
-      "SELECT * FROM musics WHERE user_id = ? LIMIT ? OFFSET ?",
-      [idOrFilePath, limit, offset],
-      (err, results) => {
-        if (err) return res.status(500).send(err);
-        if (results.length === 0)
-          return res
-            .status(404)
-            .send("محصولی ایجاد نشده به صفحه ی ایجاد محصول بروید");
-        res.json(results);
-      }
-    );
-  } else {
-    // اگر متن بود، براساس file_path جستجو شود
-    const filePath = `uploads\\${idOrFilePath}`;
-    db.query(
-      "SELECT * FROM musics WHERE file_path = ? LIMIT ? OFFSET ?",
-      [filePath, limit, offset],
-      (err, results) => {
-        if (err) {
-          res.send("Error executing query:", err);
-          return;
-        }
-        if (results.length === 0) {
-          res.send("No results found.");
-        } else {
-          res.send(results);
-        }
-      }
-    );
+  } catch (err) {
+    console.error("Error fetching music:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 
+// خواندن موزیک‌های یک کاربر بر اساس ID
+app.get("/oneUserMusics/:idOrFilePath", async (req, res) => {
+  const idOrFilePath = req.params.idOrFilePath;
 
+  try {
+    const connection = await pool.getConnection();
+    if (/^\d+$/.test(idOrFilePath)) {
+      const [results] = await connection.query(
+        "SELECT * FROM musics WHERE user_id = ?",
+        [idOrFilePath]
+      );
 
-
-// روت برای دریافت موزیک‌ها با نام آرتیست
-app.get("/music/joinmusic", (req, res) => {
-  db.query(
-    `SELECT 
-        m.title, 
-        u.username AS artistName, 
-        m.likeproduct, 
-        m.type, 
-        m.gener, 
-        m.file_path, 
-        m.file_pathtagMP3, 
-				m.orginalPriceTanzim, 
-				m.tempo,
-				m.tozihat,
-				discountPriceTanzim,
-        view,
-        sampleproduct,
-        tanzim,
-        sheroMelody,
-        m.gammuisc 
-     FROM 
-        musics m
-     JOIN 
-        users u 
-     ON 
-        m.user_id = u.userID`,
-    (err, results) => {
-      if (err) {
-        return res.status(500).send("Internal Server Error");
+      if (results.length === 0) {
+        return res.status(404).send("محصولی ایجاد نشده به صفحه ی ایجاد محصول بروید");
       }
+      res.json(results);
+    } else {
+      const filePath = `uploads/${idOrFilePath}`;
+      const [results] = await connection.query(
+        "SELECT * FROM musics WHERE file_path = ?",
+        [filePath]
+      );
 
-      // انطباق آدرس فایل
-      const musicList = results.map((music) => ({
-        ...music,
-        file_path: `http://localhost:3000/${music.file_path}`, // اضافه کردن آدرس کامل
-      }));
-
-      res.json(musicList);
+      if (results.length === 0) {
+        return res.status(404).send("No results found.");
+      } else {
+        res.json(results); // فرستادن نتایج
+      }
     }
-  );
-});
-
-app.get("/oneUserMusics/:idOrFilePath", (req, res) => {
-  const idOrFilePath = req.params.idOrFilePath;
-  if (/^\d+$/.test(idOrFilePath)) {
-  
-    db.query(
-      "SELECT * FROM musics WHERE user_id =  ?",
-      [idOrFilePath],
-      (err, results) => {
-        if (err) return res.status(500).send(err);
-        if (results.length === 0)
-          return res
-            .status(404)
-            .send(" محصولی ایجاد نشده به صفحه ی ایجاد محصول بروید");
-        res.json(results);
-      }
-    );
-  } else {
-    // اگر متن بود، براساس file_path جستجو شود
-    const filePath = `uploads\\${idOrFilePath}`;
-    db.query(
-      "SELECT * FROM musics WHERE file_path = ?",
-      [filePath],
-      (err, results) => {
-        if (err) {
-          return res.status(500).send("Error executing query: " + err);
-        }
-        if (results.length === 0) {
-          return res.status(404).send("No results found.");
-        } else {
-          const musicFile = results[0]; 
-         
-          const fullFilePath = `http://localhost:3000/${musicFile.file_path}`; 
-       
-          res.setHeader('Content-Disposition', `attachment; filename="${musicFile.file_name}"`); 
-          res.setHeader('Content-Type', '');
-          res.sendFile(fullFilePath, (err) => {
-            if (err) {
-              console.error(err);
-              res.status(500).send("Error sending file.");
-            }
-          });
-        }
-      }
-    );
+    connection.release();
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).send("Error executing query");
   }
 });
 
-
-app.put("/musics/:id", (req, res) => {
+// به روزرسانی موزیک
+app.put("/musics/:id", async (req, res) => {
   const id = req.params.id;
   const updatedData = req.body;
-  // فرض بر این است که شما از MySQL استفاده می‌کنید
+
   const { title, type, orginalPriceTanzim, discountPriceTanzim } = updatedData;
 
-  // کوئری آپدیت
   const query = `
     UPDATE musics 
     SET 
@@ -661,25 +523,22 @@ app.put("/musics/:id", (req, res) => {
       isShow = 1
     WHERE post_id = ?`;
 
-    db.query(query, [title, type, orginalPriceTanzim, discountPriceTanzim, id], (err, result) => {
-      if (err) {
-        console.error("Update error:", err);
-        return res.status(500).json({ message: "خطای سرور در به‌روزرسانی" });
-      }
-      // پس از موفقیت، کل داده‌ها را برگردان
-      db.query(`SELECT * FROM musics`, (err2, rows) => {
-        if (err2) {
-          console.error("Fetch error:", err2);
-          return res.status(500).json({ message: "خطای سرور در دریافت داده‌ها" });
-        }
-        res.status(200).json({
-          message: "به‌روزرسانی با موفقیت انجام شد",
-          data: rows,
-        });
-      });
-    });
-  });
+  try {
+    const connection = await pool.getConnection();
+    await connection.query(query, [title, type, orginalPriceTanzim, discountPriceTanzim, id]);
+    connection.release();
 
+    const [updatedResults] = await connection.query(`SELECT * FROM musics`);
+    res.status(200).json({
+      message: "به‌روزرسانی با موفقیت انجام شد",
+      data: updatedResults,
+    });
+    
+  } catch (error) {
+    console.error("Update error:", error);
+    return res.status(500).json({ message: "خطای سرور در به‌روزرسانی" });
+  }
+});
 
 
 const videoStorage = multer.diskStorage({

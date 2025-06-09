@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-
+import ServerUrl from "../API/ServerURL"
 const VideoPlayer = ({ url, thumbnail }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -168,7 +168,7 @@ const VideoPlayer = ({ url, thumbnail }) => {
       {/* ویدیو */}
       <video
         ref={videoRef}
-        src={"http://localhost:3000/uploads//videos//demoVideofile-1748607121287-169446406.mp4"}
+        src={`${ServerUrl()}uploads//videos//demoVideofile-1748607121287-169446406.mp4`}
         className="w-full aspect-video p-1 rounded-lg"
         onClick={togglePlayPause}
         onTimeUpdate={handleTimeUpdate}
