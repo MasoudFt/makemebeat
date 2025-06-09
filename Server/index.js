@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2/promise")
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
@@ -42,22 +42,21 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 //   });
   
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-});
-
-db.connect((err) => {
-  if (err) {
-    console.error('Error connecting to the database: ', err.stack);
-    return;
-  }
+async function connectDatabase() {
+  const db = await mysql.createConnection({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+  });
+  
   console.log('Connected to the database.');
-});
 
+  return db;
+}
+
+const db = connectDatabase();
 
 
 app.post("/users/register", async (req, res) => {
