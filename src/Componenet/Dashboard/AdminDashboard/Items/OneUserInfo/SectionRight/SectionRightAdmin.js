@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { VscAccount } from 'react-icons/vsc';
+import ServerURL from '../../../../../API/ServerURL';
 const SectionRightAdmin = () => {
   const [userList, setUserList] = useState([]);
   const navigate = useNavigate();
@@ -10,11 +11,11 @@ const SectionRightAdmin = () => {
     const str = location.pathname;
     const result = str.replace(/.*\/(\d+)$/, "$1");
 
-    const imageUrl = "http://localhost:3000/";
+    const imageUrl = ServerURL();
 
   const getUserListFromDb = async () => {
     try {
-      const url = `http://localhost:3000/users/${result}`;
+      const url = `${ServerURL()}users/${result}`;
       const res = await axios.get(url);
       setUserList(res.data);
     } catch (error) {

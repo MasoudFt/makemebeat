@@ -5,8 +5,9 @@ import Stack from '@mui/material/Stack';
 import { GiMetronome } from "react-icons/gi";
 import { PiMicrophoneStage } from "react-icons/pi";
 import { BsFileMusic } from "react-icons/bs";
+import ServerURL from "../../API/ServerURL";
 const MainSection = ({ OneMusicInfo }) => {
- const FinalUrl = `http://localhost:3000/`;
+ const FinalUrl = ServerURL();
   return (
     <>
       <div className="flex  gap-4 border-2 border-zinc-900">

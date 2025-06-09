@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from 'react'
 import axios from "axios";
 import VideoShow from './VideoShow';
+import ServerURL from "../API/ServerURL";
 const VideoUserListShow = () => {
     const [userList, setUserList] = useState([]);
     const [selectVideoUser, setSelectVideoUser] = useState('');
@@ -10,7 +11,7 @@ const VideoUserListShow = () => {
     console.log(post_id)
     const GetDataFromDb = async (tokenUserId, number) => {
       try {
-        const url = `http://localhost:3000/video/joinUser`;
+        const url = `${ServerURL()}video/joinUser`;
         const res = await axios.get(url);
         setUserList(res.data);
         
@@ -23,8 +24,7 @@ const VideoUserListShow = () => {
     };
     const ConfirmVideo = async () => {
       try {
-        // const url = `http://localhost:3000/videoConfirmAdmin/${post_id}`;
-        const url = `http://localhost:3000/videoConfirmAdmin/${""}`;
+        const url = `${ServerURL()}/videoConfirmAdmin/${""}`;
         const res = await axios.put(url);
         console.log(res.data);
         setError(res.data);

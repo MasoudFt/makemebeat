@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { BsBasket3 } from "react-icons/bs";
 import { FaRegComments } from "react-icons/fa6";
 import { LuDownload } from "react-icons/lu";
-import { SlControlPause, SlWallet } from "react-icons/sl";
+import { SlWallet } from "react-icons/sl";
 import { LuTicketCheck } from "react-icons/lu";
 import { MdAddShoppingCart } from "react-icons/md";
 import { RiPlayList2Fill } from "react-icons/ri";
 import { BsCardList } from "react-icons/bs";
 import { VscAccount } from "react-icons/vsc";
 import { useNavigate } from "react-router";
-
+import ServerURL from "../API/ServerURL";
 const Sidbar = ({ username, type,profilepic }) => {
   const convertPath = (filePath) => {
     if(profilepic === null){
@@ -21,7 +21,7 @@ const Sidbar = ({ username, type,profilepic }) => {
       return filePath.replace(/\\/g, '/');
   }
   };
-  const url = `http://localhost:3000/${convertPath(profilepic)}`
+  const url = `${ServerURL()}${convertPath(profilepic)}`
   // console.log(profilepic)
   const [show, setShow] = useState(false);
   const navigate = useNavigate();

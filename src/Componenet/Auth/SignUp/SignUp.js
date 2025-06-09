@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
-
+import ServerURL from "../../API/ServerURL"
 const SignUp = () => {
   const [isSignInActive, setIsSignInActive] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -91,7 +91,7 @@ const SignUp = () => {
 
   const postUser = async () => {
     try {
-      const { data } = await axios.post("http://localhost:3000/users/register", {
+      const { data } = await axios.post(`${ServerURL()}users/register`, {
         username: user.name || null,
         email: user.email || null,
         password: user.password || null,

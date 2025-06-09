@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
-
+import { useLocation } from 'react-router-dom';
+import ServerURL from '../../../../../API/ServerURL';
 const ShowVideoAdmin = () => {
 
   const [videoList, setVideoList] = useState([]);
@@ -13,7 +13,7 @@ const ShowVideoAdmin = () => {
     console.log(result)
     const getVideoFromDb = async () => {
         try {
-          const url = `http://localhost:3000/videos/${result}`;
+          const url = `${ServerURL()}videos/${result}`;
           const res = await axios.get(url);
           console.log(res)
           setVideoList(res.data);
@@ -52,7 +52,7 @@ const ShowVideoAdmin = () => {
           const updateFieldInDb = async (id) => {
             setUpdating(true); // شروع لودینگ
             try {
-              const url = `http://localhost:3000/videos/${id}`;
+              const url = `${ServerURL()}videos/${id}`;
               const response = await axios.put(url, inputValues);
               setVideoList((prevList) =>
                 prevList.map((item) => (item.post_id === id ? { ...item, ...inputValues } : item))

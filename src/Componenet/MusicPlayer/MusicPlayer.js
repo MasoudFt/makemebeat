@@ -8,6 +8,7 @@ import { PiHeadCircuitFill } from "react-icons/pi";
 import { BiDownload } from "react-icons/bi";
 import { MdStarRate } from "react-icons/md";
 import axios from "axios";
+import ServerURL from "../API/ServerURL";
 const MusicPlayer = () => {
   const [musicList, setMusicList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -29,10 +30,10 @@ const finalDuration=formatDuration(duration)
 
 
 
-  const baseUrl = "http://localhost:3000/";
+  const baseUrl = ServerURL();
   const GetDataFromDb = async () => {
     try {
-      const url = `http://localhost:3000/musics`;
+      const url = `${ServerURL()}musics`;
       const res = await axios.get(url);
       setMusicList(res.data);
       setLoading(true);

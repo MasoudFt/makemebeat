@@ -1,16 +1,12 @@
 import React, { useState } from "react";
-import { MdArrowCircleLeft } from "react-icons/md";
-import { MdArrowCircleRight } from "react-icons/md";
-import PostForm from "../SendFormData/PostForm";
 import axios from "axios";
-import { useDispatch } from "react-redux";
 import Classic from "./Items/Classic";
 import Electronic from "./Items/Electronic";
 import MixMaster from "./Items/MixMaster";
 import Pop from "./Items/Pop";
 import Rock from "./Items/Rock";
 import HipHop from "./Items/HipHop";
-import { getMusicInfo } from "../../../../../StateManagement/Action";
+import ServerURL from "../../../../../API/ServerURL";
 
 const MusicList = () => {
  
@@ -59,7 +55,7 @@ const MusicList = () => {
       });
   
       try {
-        const response = await axios.post("http://localhost:3000/musics", fd, {
+        const response = await axios.post(`${ServerURL()}musics`, fd, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

@@ -4,15 +4,13 @@ import Head from "./Head";
 import Main from "./Main/Main";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import {  useSelector } from "react-redux";
 import AdminDashbord from "./AdminDashboard/AdminDashbord";
-
+import ServerURL from "../API/ServerURL";
 const Dashbord = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-  const userId = useSelector((state) => state.userId);
   const navigate = useNavigate();
 
 const token = localStorage.getItem("authToken")
@@ -21,7 +19,7 @@ const tokenUserId = localStorage.getItem("userId")
 async function getData() {
       
     
-  await axios.get(`http://localhost:3000/users/${tokenUserId}`, {
+  await axios.get(`${ServerURL()}users/${tokenUserId}`, {
     headers: {
       Authorization: `Bearer ${token}`, // ارسال توکن در هدر
     },

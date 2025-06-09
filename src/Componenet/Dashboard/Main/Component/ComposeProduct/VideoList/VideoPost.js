@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
 import VideoListCompos from './Items/VideoListCompos';
+import ServerURL from '../../../../../API/ServerURL';
 
 const VideoPost = () => {
   const d = new Date();
@@ -98,7 +98,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    const response = await axios.post("http://localhost:3000/video-upload", fd, {
+    const response = await axios.post(`${ServerURL()}video-upload`, fd, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

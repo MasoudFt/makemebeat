@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import ServerURL from '../../../../../API/ServerURL';
 
 const PostForm = () => {
     const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const PostForm = () => {
         data.append('cover', coverFile);
 
         try {
-            const response = await axios.post('http://localhost:3000/uploadMusic', data, {
+            const response = await axios.post(`${ServerURL()}uploadMusic`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

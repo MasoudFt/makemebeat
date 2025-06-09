@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import VideoShow from './Items/OneUserInfo/Player/VideoShow'
+// import VideoShow from './Items/OneUserInfo/Player/VideoShow'
 // import VideoUserListShow from "./Items/OneUserInfo/Player";
 import { VscAccount } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
+import ServerURL from "../../API/ServerURL";
 const AdminDashbord = () => {
  const[userList,setUserList]=useState([]);
- const urlImage="http://localhost:3000/"
+ const urlImage=ServerURL()
 const navigate=useNavigate()
   const getUserListFromDb=async()=>{
     try {
-      const url="http://localhost:3000/users"
+      const url=`${ServerURL()}users`
+      
       const res=await axios.get(url)
       setUserList(res.data)
     } catch (error) {

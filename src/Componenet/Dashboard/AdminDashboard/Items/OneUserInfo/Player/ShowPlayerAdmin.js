@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from 'axios';
+import ServerURL from "../../../../../API/ServerURL";
 const ShowPlayerAdmin = () => {
   
   const urlMusicFile = useSelector((state) => state.urlMusicFile);
 // console.log(urlMusicFile)
-const baseUrl="http://localhost:3000/"
+const baseUrl=ServerURL()
 const [fileId, setFileId] = useState('');
 
 const handleDownload = async (e) => {

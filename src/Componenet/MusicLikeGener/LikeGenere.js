@@ -12,8 +12,9 @@ import {
   getOneMusicInfo,
   showMusicplayer,
 } from "../StateManagement/Action";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import ServerURL from "../API/ServerURL";
 
 const LikeGenere = ({ OneMusicInfo }) => {
   const [musicList, setMusicList] = useState([]);
@@ -26,10 +27,10 @@ const LikeGenere = ({ OneMusicInfo }) => {
       behavior: "smooth", // برای اسکرول نرم
     });
   };
-  const imageUrl = `http://localhost:3000/`;
+  const imageUrl = ServerURL();
   const getMusic = async () => {
     try {
-      const url = `http://localhost:3000/musics/like/${OneMusicInfo.type}`;
+      const url = `${ServerURL()}musics/like/${OneMusicInfo.type}`;
       const res = await axios.get(url);
       setMusicList(res.data);
     } catch (error) {

@@ -1,8 +1,7 @@
-import { getUserId, login } from "../../StateManagement/Action";
+import { login } from "../../StateManagement/Action";
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,7 +10,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch=useDispatch();
-  const auth = useSelector((state) => state.user);
  
   const handleLogin = async (e) => {
     e.preventDefault();

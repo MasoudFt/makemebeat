@@ -1,13 +1,12 @@
 import React from "react";
 import ReactPlayer from "react-player";
-
+import ServerURL from "../../../../../API/ServerURL"
 const VideoShow = ({ url, thumbnail }) => {
   return (
     <>
       <ReactPlayer
-        // url={"http://localhost:3000/uploads\\c2df6853da6115b8b0ec32cbd20727c4"}
         url={
-          "http://localhost:3000/uploads/videos/demoVideofile-1748607121287-169446406.mp4"
+          `${ServerURL()}uploads/videos/demoVideofile-1748607121287-169446406.mp4`
         }
         controls
         style={{padding:"3%",borderRadius:"5%"}}

@@ -41,20 +41,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 //     password: "Mat@123456@",
 //   });
   
-// require('dotenv').config(); // بارگذاری متغیرهای محیطی
-//    const db = mysql.createConnection({
-//      host: process.env.DB_HOST,
-//      port: process.env.DB_PORT,
-//      user: process.env.DB_USER,
-//      password: process.env.DB_PASS,
-//    });
-// require('dotenv').config()
-//    const db = mysql.createConnection({
-//      host: "remote-asiatech.runflare.com",
-//      port:30132,
-//      user: "root",
-//      password: 'qTLs4cU6!gwBFiue8COn',
-//    });
+
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -62,103 +49,7 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
 });
-// db.connect((err) => {
-//   if (err) throw err;
-//   console.log("Connected to MySQL server");
 
-//   db.query(
-//     "CREATE DATABASE IF NOT EXISTS MakeMeBeat CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-//     (err) => {
-//       if (err) throw err;
-//       console.log("Database MakeMeBeat created or already exists");
-
-//       db.query("USE MakeMeBeat", (err) => {
-//         if (err) throw err;
-//         console.log("Using database MakeMeBeat");
-
-//         // Create users table if it doesn't exist
-//         const createTableUserQuery = `
-//         CREATE TABLE IF NOT EXISTS users (
-//           userID INT AUTO_INCREMENT PRIMARY KEY,
-//           username VARCHAR(255) NOT NULL,
-//           name VARCHAR(255),
-//           family VARCHAR(255),
-//           email VARCHAR(255) NOT NULL UNIQUE,
-//           password VARCHAR(255) NOT NULL,
-//           mobilePhone VARCHAR(20),
-//           stadiouadrres VARCHAR(255),
-//           certificateSatdiouNumber VARCHAR(255),
-//           buyer BOOLEAN DEFAULT FALSE,
-//           seller BOOLEAN DEFAULT FALSE,
-//           createat VARCHAR(255),
-//           artist BOOLEAN DEFAULT FALSE,
-//           tozihat TEXT
-//         )`;
-//         db.query(createTableUserQuery, (err) => {
-//           if (err) throw err;
-//           console.log("Users table created or already exists");
-//         });
-//         const createVideoUploadTableQuery = `
-//       CREATE TABLE IF NOT EXISTS video_upload (
-//     post_id INT AUTO_INCREMENT PRIMARY KEY,  
-//     user_id INT NOT NULL,
-//     title VARCHAR(255) NOT NULL,
-//     filepathImage VARCHAR(255) ,
-//     createat VARCHAR(255)  ,
-//     isShow tinyint  ,
-//     tozihat TEXT,
-//     likeproduct VARCHAR(255)  ,
-//     type VARCHAR(255)  ,
-//     director INT DEFAULT 0,
-//     nameSdirector VARCHAR(255) DEFAULT '',
-//     actor INT DEFAULT 0,
-//     nameSactor VARCHAR(255) DEFAULT '',
-//     senarioWriter INT DEFAULT 0,
-//     nameSsenarioWriter VARCHAR(255) DEFAULT '',
-//     productionManager INT DEFAULT 0,
-//     nameSproductionManager VARCHAR(255) DEFAULT '',
-//     cinematographer INT DEFAULT 0,
-//     nameScinematographer VARCHAR(255) DEFAULT '',
-//     lightingDesigner INT DEFAULT 0,
-//     nameSlightingDesigner VARCHAR(255) DEFAULT '',
-//     makeUpArtist INT DEFAULT 0,
-//     nameSmakeUpArtist VARCHAR(255) DEFAULT '',
-//     setPlace VARCHAR(255) DEFAULT '',
-//     nameSsetPlace VARCHAR(255) DEFAULT '',
-//     costumeDesigner INT DEFAULT 0,
-//     nameScostumeDesigner VARCHAR(255) DEFAULT '',
-//     fieldSpesialEffectDesigner INT DEFAULT 0,
-//     nameSfieldSpesialEffectDesigner VARCHAR(255) DEFAULT '',
-//     visualEffectDseigner INT DEFAULT 0,
-//     nameSvisualEffectDseigner VARCHAR(255) DEFAULT '',
-//     edit INT DEFAULT 0,
-//     nameSedit VARCHAR(255) DEFAULT '',
-//     otherFactor INT DEFAULT 0,
-//     nameSotherFactor VARCHAR(255) DEFAULT '',
-//     cameraCount INT DEFAULT 0,
-//     cameraModel VARCHAR(255) DEFAULT '',
-//     lightingCount INT DEFAULT 0,
-//     lightingModel VARCHAR(255) DEFAULT '',
-//     moveMentEquipmentCranes VARCHAR(255) DEFAULT '',
-//     moveMentEquipmentHelishot VARCHAR(255) DEFAULT '',
-//     moveMentEquipmentRonin VARCHAR(255) DEFAULT '',
-//     moveMentEquipmentRail VARCHAR(255) DEFAULT '',
-//     otherEquipment TEXT,
-//     orginalPrice VARCHAR(255),
-//     discountPrice VARCHAR(255),
-//     demoVideofile VARCHAR(255) DEFAULT '',
-//     FOREIGN KEY (user_id) REFERENCES users(userID)
-// );
-//       `;
-//         db.query(createVideoUploadTableQuery, (err) => {
-//           if (err) throw err;
-//           console.log("Table video_upload checked/created");
-//         });
-
-//       });
-//     }
-//   );
-// });
 db.connect((err) => {
   if (err) {
     console.error('Error connecting to the database: ', err.stack);
@@ -166,6 +57,7 @@ db.connect((err) => {
   }
   console.log('Connected to the database.');
 });
+
 
 
 app.post("/users/register", async (req, res) => {
@@ -180,6 +72,7 @@ app.post("/users/register", async (req, res) => {
   } = req.body;
 
   try {
+    // هش کردن رمز عبور
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // تعیین نوع خریدار و فروشنده
@@ -191,7 +84,8 @@ app.post("/users/register", async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL) 
     `; // فیلد profile_path به عنوان NULL
 
-    await db.query(query, [username, email, hashedPassword, mobile, name, family, buyer, seller], (err) => {
+    // اجرای کوئری
+    db.query(query, [username, email, hashedPassword, mobile, name, family, buyer, seller], (err) => {
       if (err) {
         if (err.code === "ER_DUP_ENTRY") {
           return res.status(400).send({ message: "User already exists" });
@@ -201,9 +95,12 @@ app.post("/users/register", async (req, res) => {
       res.send("User created successfully");
     });
   } catch (error) {
+    console.error('Error during registration:', error); // ثبت خطا در کنسول
     res.status(500).send({ message: "Server error" });
   }
 });
+
+
 app.put("/users/update/:userId", upload2.single('image'), async (req, res) => {
   const userId = req.params.userId;
   let profilePath = req.file ? req.file.path : null; // مسیر عکس بارگذاری شده

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import ServerURL from "../../../../../../API/ServerURL";
 
 const HipHop = ({ Component }) => {
   const userId = useSelector((state) => state.userId);
@@ -300,7 +301,7 @@ const HipHop = ({ Component }) => {
     });
 
     try {
-      const response = await axios.post("http://localhost:3000/musics", fd, {
+      const response = await axios.post(`${ServerURL()}musics`, fd, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

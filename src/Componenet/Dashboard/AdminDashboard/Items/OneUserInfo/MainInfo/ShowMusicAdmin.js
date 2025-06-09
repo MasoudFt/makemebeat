@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { VscAccount } from 'react-icons/vsc';
 import { useDispatch } from 'react-redux';
 import {fetchurlMuiscFile} from "../../../../../StateManagement/Action";
-
+import ServerURL from '../../../../../API/ServerURL';
 const ShowMusicAdmin = () => {
 
   const [updating, setUpdating] = useState(false); // اضافه کردن وضعیت لودینگ به‌روزرسانی
@@ -16,12 +16,12 @@ const ShowMusicAdmin = () => {
     const str = location.pathname;
     const result = str.replace(/.*\/(\d+)$/, "$1");
 
-    const imageUrl = "http://localhost:3000/";
+    const imageUrl = ServerURL();
     
 
   const getMusicListFromDb = async () => {
     try {
-      const url = `http://localhost:3000/oneUserMusics/${result}`;
+      const url = `${ServerURL()}oneUserMusics/${result}`;
       const res = await axios.get(url);
       setMusicList(res.data);
       console.log(res.data)
@@ -59,7 +59,7 @@ const ShowMusicAdmin = () => {
       const updateFieldInDb = async (id) => {
         setUpdating(true); // شروع لودینگ
         try {
-          const url = `http://localhost:3000/musics/${id}`;
+          const url = `${ServerURL()}musics/${id}`;
           const response = await axios.put(url, inputValues);
           setMusicList((prevList) =>
             prevList.map((item) => (item.post_id === id ? { ...item, ...inputValues } : item))

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { fetchImage } from "../../../../StateManagement/Action"; // فرض بر این است که این اکشن را دارید
+import ServerURL from '../../../../API/ServerURL';
 
 const CompletInformation = () => {
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ const CompletInformation = () => {
     data.append("userId", userInfo.userId); // شناسه کاربر را به فرم اضافه کنید
     // console.log(userInfo.userId)
     try {
-      const res = await axios.put(`http://localhost:3000/users/update/${userInfo.userId}`, data, {
+      const res = await axios.put(`${ServerURL()}users/update/${userInfo.userId}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       console.log(res.data);

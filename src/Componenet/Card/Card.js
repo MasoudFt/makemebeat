@@ -3,11 +3,11 @@ import { useSelector,useDispatch } from 'react-redux';
 import { removeFromCart } from '../StateManagement/Action';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Stack } from '@mui/material';
-
+import ServerURL from '../API/ServerURL';
 const Card = () => {
 const { cart, alert }=useSelector((state)=>state.cartLit)
 const userCartList = localStorage.getItem("cart")
-const imageUrl=`http://localhost:3000/`;
+const imageUrl=ServerURL();
 const dispatch = useDispatch();
 const navigate=useNavigate();
 

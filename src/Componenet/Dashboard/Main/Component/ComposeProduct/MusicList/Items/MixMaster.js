@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from 'react-redux';
 import axios from 'axios';
+import ServerURL from "../../../../../../API/ServerURL";
 const MixMaster = ({Component}) => {
   const userId = useSelector((state) => state.userId);
   const d = new Date();
@@ -62,7 +63,7 @@ const MixMaster = ({Component}) => {
     });
 
     try {
-      const response = await axios.post("http://localhost:3000/musics", fd, {
+      const response = await axios.post(`${ServerURL()}musics`, fd, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

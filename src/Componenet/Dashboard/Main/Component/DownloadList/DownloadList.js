@@ -3,11 +3,12 @@ import { FiTrash2 } from 'react-icons/fi';
 import { LuDownload } from 'react-icons/lu';
 import { useSelector } from "react-redux";
 import axios from "axios";
+import ServerURL from "../../../../API/ServerURL";
 
 const DownloadList = () => {
   const [musicList, setMusicList] = useState([]);
   const MusicFileName = useSelector((state) => state.musicId);
-  const url = `http://localhost:3000/musics/${MusicFileName.fileName}`;
+  const url = `${ServerURL()}musics/${MusicFileName.fileName}`;
 
   const getMusic = async () => {
     try {

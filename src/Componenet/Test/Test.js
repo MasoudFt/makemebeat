@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux";
 import { FaRegArrowAltCircleUp } from "react-icons/fa";
 import { FaRegArrowAltCircleDown } from "react-icons/fa";
 import {  showMusicplayer } from "../StateManagement/Action";
+import ServerURL from "../API/ServerURL";
 
 const Test = ({infoOneMusic}) => {
   const [musicList, setMusicList] = useState([]);
@@ -22,7 +23,7 @@ const Test = ({infoOneMusic}) => {
   const [show, setShow] = useState(true);
   const [number, setNumber] = useState(0);
   const dispatch=useDispatch();
-  const baseUrl = "http://localhost:3000/";
+  const baseUrl = ServerURL();
   const urlFinal = baseUrl + (infoOneMusic.file_pathtagMP3||infoOneMusic.file_pathMP3Orginal);
   const audioRef = useRef(null);
 

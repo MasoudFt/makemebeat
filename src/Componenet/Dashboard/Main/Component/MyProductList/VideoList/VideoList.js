@@ -5,6 +5,7 @@ import { fetchImage } from "../../../../../StateManagement/Action";
 import { MdArrowCircleLeft } from "react-icons/md";
 
 import { MdArrowCircleRight } from "react-icons/md";
+import ServerURL from "../../../../../API/ServerURL";
 
 const VideoList = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -54,7 +55,7 @@ const VideoList = () => {
   
       try {
         const res = await axios.post(
-          "http://localhost:3000/uploadProfile",
+          `${ServerURL()}uploadProfile`,
           data,
           {
             headers: { "Content-Type": "multipart/form-data" },

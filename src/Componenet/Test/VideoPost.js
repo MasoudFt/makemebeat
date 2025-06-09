@@ -1,75 +1,8 @@
 
-// // Frontend (React) - Video Upload Form
-
-
-// import React, { useState } from 'react';
-// import axios from 'axios';
-// import { useSelector } from 'react-redux';
-// const VideoPost = () => {
-  //     const userId = useSelector((state) => state.userId);
-//   const [videoFile, setVideoFile] = useState(null);
-//   const [title, setTitle] = useState('');
-//   const [uploadStatus, setUploadStatus] = useState('');
-
-//   const handleVideoChange = (e) => {
-//     setVideoFile(e.target.files[0]);
-//   };
-
-//   const handleTitleChange = (e) => {
-//     setTitle(e.target.value);
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!videoFile) {
-//       setUploadStatus('Please select a video file.');
-//       return;
-//     }
-
-//     const formData = new FormData();
-//     formData.append('video', videoFile);
-//     formData.append('title', title);
-//     formData.append('user_id', 1); // Replace with actual user ID
-
-//     try {
-//       const response = await axios.post('http://localhost:3000/video-uploadtest', formData, {
-//         headers: {
-//           'Content-Type': 'multipart/form-data',
-//         },
-//       });
-//       setUploadStatus(response.data);
-//     } catch (error) {
-//       console.error('Error uploading video:', error);
-//       setUploadStatus('Error uploading video.');
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <h2>Upload Video</h2>
-//       <form onSubmit={handleSubmit}>
-//         <div>
-//           <label htmlFor="title">Title:</label>
-//           <input type="text" id="title" value={title} onChange={handleTitleChange} />
-//         </div>
-//         <div>
-//           <label htmlFor="video">Video File:</label>
-//           <input type="file" id="video" accept="video/*" onChange={handleVideoChange} />
-//         </div>
-//         <button type="submit">Upload</button>
-//         {uploadStatus && <p>{uploadStatus}</p>}
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default VideoPost;
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import ServerURL from '../API/ServerURL';
 const VideoUpload = () => {
-      const userId = useSelector((state) => state.userId);
   const [videoFile, setVideoFile] = useState(null);
   const [title, setTitle] = useState('');
   const [videos, setVideos] = useState([]);
@@ -97,7 +30,7 @@ const VideoUpload = () => {
     formData.append('user_id', 1); // به جای 1، شناسه کاربر واقعی را قرار دهید
 
     try {
-      await axios.post('http://localhost:3000/video-upload', formData, {
+      await axios.post(`${ServerURL()}video-upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -112,7 +45,7 @@ const VideoUpload = () => {
 
   const fetchVideos = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/videos');
+      const response = await axios.get(`${ServerURL()}videos`);
       setVideos(response.data);
     } catch (error) {
       console.error('خطا در دریافت ویدیوها:', error);

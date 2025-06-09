@@ -13,22 +13,21 @@ import { useDispatch } from "react-redux";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 // import 'react-lazy-load-image-component/src/effects/blur.css';
 import { motion, AnimatePresence } from "framer-motion";
-
+import ServerURL from "../API/ServerURL";
 const WeeklyMusicList = () => {
   const [musicList, setMusicList] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
-  const FinalUrl = `http://localhost:3000/`;
-  
+  const FinalUrl = ServerURL();
+  // console.log(FinalUrl)
   const getMusic = useCallback(async () => {
     try {
       setLoading(true);
-      const url = `http://localhost:3000/musics`;
+      const url = `${ServerURL()}musics`;
       const res = await axios.get(url);
       setMusicList(res.data);
-      console.log(res.data)
     } catch (error) {
       console.log(error.response);
     } finally {
