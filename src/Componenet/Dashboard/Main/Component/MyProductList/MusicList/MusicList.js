@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import { useNavigate } from "react-router-dom";
+import ServerURL from "../../../../../API/ServerURL";
 
 const MusicList = () => {
   const [musicList,setMusicList]=useState([]);
-  const [newUrls, setNewUrls] = useState([]);
   const [error, setError] = useState("");
   const [number, setNumber] = useState(1);
   const navigate=useNavigate()
@@ -20,21 +20,15 @@ const MusicList = () => {
     {title:"قیمت با تخفیف"},
   ]
   const tokenUserId = localStorage.getItem("userId")
-  const Imageurl = 'http://localhost:3000/'
+  const Imageurl = ServerURL()
   const GetDataFromDb = async (tokenUserId, number) => {
     try {
-      const url = `http://localhost:3000/musics/${tokenUserId}/${number}`;
+      const url = `${ServerURL()}musics/${tokenUserId}/${number}`;
       const res = await axios.get(url);
       setMusicList(res.data);
-      const newUrlArray = res.data.map((a) => {
-        const fixedPath = a.file_pathImage.replace(/\\/g, '/'); 
-        const cleanedPath = fixedPath.replace(/^"|"$/g, '');
-        return `http://localhost:3000/${cleanedPath}`;
-      });
-      setNewUrls(newUrlArray);
     } catch (error) {
       console.log(error);
-      // setError(error.response.data);
+      setError(error.response.data);
     }
   };
 

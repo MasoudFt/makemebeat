@@ -49,24 +49,29 @@ const CompletInformation = () => {
   ];
 
   return (
-      <form onSubmit={postFormData} className="text-white text-xl">
-    <div className="grid grid-cols-2 font-bold text-white text-base gap-4 p-2">
-        {items.map((item) => (
-          <div key={item.id}>
-            <label className="grid px-2 py-2 ml-2">{item.label}</label>
-            <input
-              name={item.name} // نام ورودی را به عنوان کلید در state استفاده می‌کنیم
-              onChange={handleInputChange} // تابع تغییر داینامیک
-              type={item.type}
-              placeholder={item.label}
-              className={item.className}
-              accept={item.type === 'file' ? "image/*" : undefined} // فقط برای ورودی فایل
-            />
-          </div>
-        ))}
-        <button className={ButtonClassName} type="submit">ارسال</button>
+    <form onSubmit={postFormData} className="bg-zinc-950 p-6 rounded-lg shadow-lg max-w-4xl mx-auto text-white text-xl">
+    <h2 className="text-2xl font-bold mb-4 text-purple-400 text-center">فرم ارسال اطلاعات</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 font-bold text-base gap-6">
+      {items.map((item) => (
+        <div key={item.id} className="flex flex-col">
+          <label className="px-2 py-2">{item.label}</label>
+          <input
+            name={item.name} 
+            onChange={handleInputChange} 
+            type={item.type}
+            placeholder={item.label}
+            className={`p-2 rounded-md border border-purple-600 bg-transparent focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors duration-200 ${item.className}`}
+            accept={item.type === 'file' ? "image/*" : undefined}
+          />
+        </div>
+      ))}
+      <div className="col-span-1 md:col-span-2 flex justify-center">
+        <button className={`${ButtonClassName} w-full md:w-auto py-2 px-4 rounded-lg transition-colors duration-200 bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400`} type="submit">
+          ارسال
+        </button>
+      </div>
     </div>
-      </form>
+  </form>
   );
 };
 
