@@ -31,14 +31,13 @@ const Pop = ({Component}) => {
     productDescription: "", // Changed from tozihat to productDescription
     demoMP3File: null,
     mainMP3File: null,
-    tagMP3: null,
+    tagMP3File: null,
     waveFile: null,
     projectFile: null,
     coverImage: null,
     primaryAmount: "",
     discountAmount: "",
   });
-  console.log(inputValues)
   const [formData, setFormData] = useState({
     message: "",
     gammuisc: "",
@@ -114,7 +113,7 @@ const Pop = ({Component}) => {
     {
       name: "تنظیم",
       item: [
-        { name: "mp3 با تگ دارد", field: "tagMP3", labelInput: "mp3 با تگ", type: "file", accept: ".mp3",note:"انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 20 MB." },
+        { name: "mp3 با تگ دارد", field: "tagMP3File", labelInput: "mp3 با تگ", type: "file", accept: ".mp3",note:"انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 20 MB." },
         { name: "wave دارد", field: "waveFile", labelInput: "wave", type: "file", accept: ".wav",note:"انواع فایل های مجاز : wav, حداکثر اندازه فایل: 100 MB." },
         { name: "پروژه (لاین به لاین) دارد", field: "projectFile", labelInput: "(لاین به لاین)", type: "file",note:"انواع فایل های مجاز : zip, rar, حداکثر اندازه فایل: 1,000 MB." },
         { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text",note:"قیمت به تومان وارد شود." },

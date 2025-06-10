@@ -24,8 +24,10 @@ const Test = ({infoOneMusic}) => {
   const [number, setNumber] = useState(0);
   const dispatch=useDispatch();
   const baseUrl = ServerURL();
+  // const baseUrl = "http://localhost:3000/";
   const urlFinal = baseUrl + (infoOneMusic.file_pathtagMP3||infoOneMusic.file_pathMP3Orginal);
   const audioRef = useRef(null);
+ 
 
   function formatDuration(duration) {
     if (typeof duration !== "number" || isNaN(duration) || duration < 0)

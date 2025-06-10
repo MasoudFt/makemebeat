@@ -12,7 +12,6 @@ const Dashbord = () => {
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
-
   const token = localStorage.getItem("authToken");
   const tokenUserId = localStorage.getItem("userId");
 
@@ -41,7 +40,7 @@ const Dashbord = () => {
       }
     };
     getData();
-  }, [navigate, token, tokenUserId]);
+  }, [navigate, token, tokenUserId,]);
 
   if (loading) {
     return (

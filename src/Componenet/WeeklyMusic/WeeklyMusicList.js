@@ -11,7 +11,6 @@ import { fetchurlMuiscFile, getOneMusicInfo, showMusicplayer } from "../StateMan
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-// import 'react-lazy-load-image-component/src/effects/blur.css';
 import { motion, AnimatePresence } from "framer-motion";
 import ServerURL from "../API/ServerURL";
 const WeeklyMusicList = () => {
@@ -21,13 +20,15 @@ const WeeklyMusicList = () => {
   const dispatch = useDispatch();
   
   const FinalUrl = ServerURL();
-  // console.log(FinalUrl)
+  // const FinalUrl = "http://localhost:3000/";
   const getMusic = useCallback(async () => {
     try {
       setLoading(true);
       const url = `${ServerURL()}musics`;
+      // const url = `http://localhost:3000/musics`;
       const res = await axios.get(url);
       setMusicList(res.data);
+      console.log(res.data)
     } catch (error) {
       console.log(error.response);
     } finally {
@@ -72,6 +73,14 @@ const WeeklyMusicList = () => {
   }
 
   return (
+    <>
+  {
+    loading?
+    <div className="flex justify-center items-center h-96">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+:
+ 
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-12 gap-4 items-center">
         <div className="col-span-1 flex justify-end">
@@ -198,6 +207,8 @@ const WeeklyMusicList = () => {
         </div>
       </div>
     </div>
+     }
+    </>
   );
 };
 

@@ -35,7 +35,6 @@ function App() {
   const { cart }=useSelector((state)=>state.cartLit)
   const location = useLocation();
   const [alert, setAlert] = useState(false);
-  const dispatch = useDispatch();
   const userNameToken = localStorage.getItem("userId")
   useEffect(() => {
     const timer = setTimeout(() => {

@@ -77,7 +77,7 @@ const Slider = ({ product }) => {
                } ${isTransitioning && "transform -translate-x-full"}`}
              >
                <img
-                 src={product[currentSlide].ImagePath}
+                 src={product[currentSlide].profile_path}
                  alt={`Slide ${index}`}
                  className="h-full w-screen  object-cover rounded-xl shadow-xl"
                />

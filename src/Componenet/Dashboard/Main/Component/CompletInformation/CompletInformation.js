@@ -6,9 +6,9 @@ import ServerURL from '../../../../API/ServerURL';
 
 const CompletInformation = () => {
   const [formData, setFormData] = useState({
-    // lastName: '',
-    // licenseNumber: '',
-    // studioAddress: '',
+    lastName: '',
+    licenseNumber: '',
+    studioAddress: '',
     image: null,
   });
   const dispatch = useDispatch();
@@ -42,10 +42,10 @@ const CompletInformation = () => {
 
   const ButtonClassName = "rounded-xl grid col-span-2 place-content-center text-white text-xl h-12 mt-7 font-semibold bg-black border border-purple-600 w-24 p-2";
   const items = [
-    { id: 1, label: "نام خانوادگی", name: "lastName", type: "text", className: "w-full border-solid border-2 border-purple-600 p-2 mt-1 bg-zinc-950 text-white rounded-md focus:outline-none" },
-    { id: 2, label: "شماره مجوز", name: "licenseNumber", type: "text", className: "w-full border-solid border-2 border-purple-600 p-2 mt-1 bg-zinc-950 text-white rounded-md focus:outline-none" },
-    { id: 3, label: "آدرس استودیو", name: "studioAddress", type: "text", className: "w-full border-solid border-2 border-purple-600 p-2 mt-1 bg-zinc-950 text-white rounded-md focus:outline-none" },
-    { id: 4, label: "آپلود تصویر", name: "image", type: "file", className: "w-full border-purple-600 mt-1 border-2 bg-zinc-950 border-gray-300 rounded-lg cursor-pointer focus:outline-none" },
+    { id: 1, label: "نام خانوادگی", name: "lastName", type: "text", className: "w-full border-solid border-2 border-purple-600 p-2 mt-1 bg-zinc-950 text-white rounded-md" },
+    { id: 2, label: "شماره مجوز", name: "licenseNumber", type: "text", className: "w-full border-solid border-2 border-purple-600 p-2 mt-1 bg-zinc-950 text-white rounded-md" },
+    { id: 3, label: "آدرس استودیو", name: "studioAddress", type: "text", className: "w-full border-solid border-2 border-purple-600 p-2 mt-1 bg-zinc-950 text-white rounded-md" },
+    { id: 4, label: "آپلود تصویر", name: "image", type: "file", className: "w-full border-purple-600 mt-1 border-2 bg-zinc-950 border-gray-300 rounded-lg cursor-pointer" },
   ];
 
   return (
@@ -60,7 +60,8 @@ const CompletInformation = () => {
             onChange={handleInputChange} 
             type={item.type}
             placeholder={item.label}
-            className={`p-2 rounded-md border border-purple-600 bg-transparent focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors duration-200 ${item.className}`}
+            // className={`p-2 rounded-md border border-purple-600 bg-transparent focus:outline-none  transition-colors duration-200 ${item.className}`}
+            className={`${item.className}`}
             accept={item.type === 'file' ? "image/*" : undefined}
           />
         </div>

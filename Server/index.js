@@ -17,17 +17,26 @@ const port = 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
-const uploadMusic = multer({ dest: "uploads/musics" });
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    
+    const destinationMap = {
+      'coverImage': 'uploads/musics/Cover',
+      'productImage': 'uploads/musics/productImage',
+    
+    };
+   
+    const destinationPath = destinationMap[file.fieldname] || 'uploads/musics';
+    cb(null, destinationPath);
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const filename = `${Date.now()}${ext}`; // ایجاد نام منحصر به فرد برای فایل
-    cb(null, filename);
+    // const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    cb(null, file.originalname);
   }
 });
+
+const uploadMusic = multer({ storage })
 const upload2 = multer({ storage });
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -167,7 +176,7 @@ app.post("/musics", uploadMusic.fields([
   { name: "coverImage", maxCount: 1 },
   { name: "demoMP3File", maxCount: 1 },
   { name: "mainMP3File", maxCount: 1 },
-  { name: "tagMP3", maxCount: 1 },
+  { name: "tagMP3File", maxCount: 1 },
   { name: "waveFile", maxCount: 1 },
   { name: "projectFile", maxCount: 1 }
 ]), async (req, res) => {
@@ -191,12 +200,23 @@ app.post("/musics", uploadMusic.fields([
   } = req.body;
 
   const file_pathImage = req.files.productImage?.[0]?.path || null;
+  const file_typeImage = req.files.productImage?.[0]?.mimetype || null;
+  const file_pathMP3demo = req.files.demoMP3File?.[0]?.path || null;
+  const file_typeMP3demo = req.files.demoMP3File?.[0]?.mimetype || null;
+  const file_pathMP3Orginal = req.files.mainMP3File?.[0]?.path || null;
+  const file_typeMP3Orginal = req.files.mainMP3File?.[0]?.mimetype || null;
+  const file_pathtagMP3 = req.files.tagMP3File?.[0]?.path || null;
+  const file_typetagMP3 = req.files.tagMP3File?.[0]?.mimetype || null;
+  const file_pathWave = req.files.waveFile?.[0]?.path || null;
+  const file_typeWave = req.files.waveFile?.[0]?.mimetype || null;
+  const file_pathProjectLine = req.files.projectFile?.[0]?.path || null;
+  const file_typeProjectLine = req.files.projectFile?.[0]?.mimetype || null;
   const file_pathCoverSample = req.files.coverImage?.[0]?.path || null;
 
   const query = `
     INSERT INTO musics 
-    (user_id, title, file_pathImage, cover_path, createat, view, likeproduct, post_id, sheroMelody, tanzim, sampleproduct, type, gener, gammuisc, tempo, tozihat, orginalPriceTanzim, discountPriceTanzim) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    (user_id, title, file_pathImage, file_typeImage, cover_path, createat, view, likeproduct, post_id, sheroMelody, tanzim, sampleproduct, type, gener, gammuisc, tempo, tozihat, file_pathMP3demo, file_typeMP3demo, file_pathMP3Orginal, file_typeMP3Orginal, file_pathtagMP3, file_typetagMP3, file_pathWave, file_typeWave, file_pathProjectLine, file_typeProjectLine, orginalPriceTanzim, discountPriceTanzim, isShow) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   try {
     const connection = await pool.getConnection();
@@ -204,11 +224,12 @@ app.post("/musics", uploadMusic.fields([
       user_id || null,
       title || null,
       file_pathImage,
+      file_typeImage,
       file_pathCoverSample,
       createat || null,
       view || null,
       likeproduct || null,
-      post_id ,
+      post_id || null,
       sheroMelody || 0,
       tanzim || 0,
       sampleproduct || 0,
@@ -217,8 +238,19 @@ app.post("/musics", uploadMusic.fields([
       gammuisc || null,
       tempo || null,
       tozihat || null,
+      file_pathMP3demo,
+      file_typeMP3demo,
+      file_pathMP3Orginal,
+      file_typeMP3Orginal,
+      file_pathtagMP3,
+      file_typetagMP3,
+      file_pathWave,
+      file_typeWave,
+      file_pathProjectLine,
+      file_typeProjectLine,
       orginalPriceTanzim || null,
-      discountPriceTanzim || null
+      discountPriceTanzim || null,
+      0 // مقدار isShow همیشه 0
     ]);
     connection.release();
     res.send({ status: 201, message: "بارگذاری موسیقی با موفقیت انجام شد" });
@@ -338,6 +370,7 @@ app.get("/musics", async (req, res) => {
           m.type, 
           m.gener, 
           m.file_pathImage, 
+          m.cover_path, 
           m.orginalPriceTanzim, 
           m.tempo,
           m.post_id,

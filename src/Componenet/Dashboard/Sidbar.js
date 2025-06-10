@@ -22,7 +22,6 @@ const Sidbar = ({ username, type,profilepic }) => {
   }
   };
   const url = `${ServerURL()}${convertPath(profilepic)}`
-  // console.log(profilepic)
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("authToken");
