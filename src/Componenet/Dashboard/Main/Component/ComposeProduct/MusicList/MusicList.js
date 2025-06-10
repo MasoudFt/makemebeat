@@ -83,66 +83,7 @@ const MusicList = () => {
 
   return (
      <>
-          {/* {
-            show ? 
-            <>
-            <PostForm/>
-            </>
-            :
-            <>
-          <div className="grid grid-cols-12 gap-2  place-content-center ">
-            <div className="col-span-1 ">
-              <div className="grid justify-items-end  items-center h-full w-full">
-                <MdArrowCircleRight
-                  color="gray"
-                  style={{ cursor: "pointer" }}
-                  size={40}
-                  onClick={handelPervIndexPic}
-                />
-              </div>
-            </div>
     
-            <div className="col-span-10">
-              <div className={`mt-5 p-3 grid grid-cols-3 gap-2`}>
-                {image.slice(currentSlide, currentSlide + 3).map((a, i) => (
-                  <div
-                    key={a.name}
-                    className={`w-full col 
-                       rounded-lg shadow-sm  `}
-                      onClick={()=>{setShow(true);setSelectGender(i)}}
-                  >
-                    <img
-                      alt={a.name}
-                      className="p-2 rounded-xl h-72 w-full"
-                      src={a.url}
-                    />
-                    <div className="px-2 pb-2 ">
-                      <div className="justify-items-center ">
-                        <h5 className="text-2xl mb-2 font-semibold tracking-tight text-gray-900 dark:text-stone-300 ">
-                          {a.name}
-                        </h5>
-                      </div>
-                      <div className="flex items-center justify-between mt-2.5 mb-5">
-                        <div className="flex  items-center space-x-1 rtl:space-x-reverse"></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="col-span-1">
-              <div className="grid justify-items-start items-center h-full w-full">
-                <MdArrowCircleLeft
-                  color="gray"
-                  style={{ cursor: "pointer" }}
-                  size={40}
-                  onClick={handelNextIndexPic}
-                />
-              </div>
-            </div>
-          </div>
-          </>
-          } */}
             <div className="bg-zinc-950 h-full">
           <div dir="rtl" className="flex justify-between p-1 gap-2 m-1 text-white font-bold text-xl ">
             {itemProduct.map((item) => (

@@ -196,7 +196,7 @@ app.post("/musics", uploadMusic.fields([
   const query = `
     INSERT INTO musics 
     (user_id, title, file_pathImage, cover_path, createat, view, likeproduct, post_id, sheroMelody, tanzim, sampleproduct, type, gener, gammuisc, tempo, tozihat, orginalPriceTanzim, discountPriceTanzim) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   try {
     const connection = await pool.getConnection();
@@ -208,7 +208,7 @@ app.post("/musics", uploadMusic.fields([
       createat || null,
       view || null,
       likeproduct || null,
-      post_id || null,
+      post_id ,
       sheroMelody || 0,
       tanzim || 0,
       sampleproduct || 0,

@@ -66,6 +66,7 @@ const Pop = ({Component}) => {
 
     try {
       const response = await axios.post(`${ServerURL()}musics`, fd, {
+      // const response = await axios.post(`http://localhost:3000/musics`, fd, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
