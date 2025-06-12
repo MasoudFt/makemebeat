@@ -87,7 +87,7 @@ function App() {
             <ScrollTop />
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/product" element={<Product />} />
+              <Route path="/product/:Items" element={<Product />} />
               <Route path="/musicPlayer" element={<MusicPlayer />} />
               <Route path="/login" element={<Login />} />
               <Route path="/test" element={<Test />} />

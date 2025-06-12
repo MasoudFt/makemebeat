@@ -153,7 +153,7 @@ const Navbar = () => {
                     <ul>
                       {subItems[item.name]?.map((subItem, index) => (
                         <li key={index} className="hover:text-purple-700 p-1">
-                          <Link to={`/sub${subItem}`}>{subItem}</Link>
+                          <Link  to={`/product${subItem}`}>{subItem}</Link>
                         </li>
                       ))}
                     </ul>

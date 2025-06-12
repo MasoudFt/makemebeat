@@ -613,13 +613,10 @@ const uploadVideo = multer({
 });
 
 
-app.post("/video-upload", 
-  uploadVideo.single("demoVideofile"), (req, res) => {
-  // console.log(req.file)
-  if (!req.file) {
-    return res.status(400).json({ error: 'No video file uploaded or invalid file type' });
-  }
-
+app.post("/video_upload", uploadVideo.fields([
+  { name: "demoVideofile", maxCount: 1 },
+  { name: "filepathImage", maxCount: 1 } // Assuming you might also have an image upload field.
+]), async (req, res) => {
   const {
     user_id,
     title,
@@ -647,8 +644,8 @@ app.post("/video-upload",
     nameScostumeDesigner,
     fieldSpesialEffectDesigner,
     nameSfieldSpesialEffectDesigner,
-    visualEffectDseigner,
-    nameSvisualEffectDseigner,
+    visualEffectDesigner,
+    nameSvisualEffectDesigner,
     edit,
     nameSedit,
     otherFactor,
@@ -665,140 +662,100 @@ app.post("/video-upload",
     orginalPrice,
     discountPrice,
   } = req.body;
-  const filepathImage = req.body.filepathImage;
-  const demoVideofilePath = req.file.path;
-  console.log(req.body)
-  const relativeVideoPath = path.relative(__dirname, demoVideofilePath).replace(/\\/g, '/');
-  // اعتبارسنجی فیلدهای ضروری
-  if (!user_id || !title ) { // تغییر file_path به filepathImage
+
+  const demoVideofilePath = req.files.demoVideofile?.[0]?.path || null;
+  const filepathImage = req.files.filepathImage?.[0]?.path || null; // Adding image path extraction
+
+  const relativeVideoPath = demoVideofilePath ? path.relative(__dirname, demoVideofilePath).replace(/\\/g, '/') : null;
+
+  // Validation for mandatory fields
+  if (!user_id || !title || !demoVideofilePath) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
-  const user_id_val = user_id || null;
-  const title_val = title || null;
-  const tozihat_val = tozihat || null;
-  const likeproduct_val = likeproduct || null;
-  const type_val = type || null;
-  const director_val = director || null;
-  const nameSdirector_val = nameSdirector || null;
-  const actor_val = actor || null;
-  const nameSactor_val = nameSactor || null;
-  const senarioWriter_val = senarioWriter || null;
-  const nameSsenarioWriter_val = nameSsenarioWriter || null;
-  const productionManager_val = productionManager || null;
-  const nameSproductionManager_val = nameSproductionManager || null;
-  const cinematographer_val = cinematographer || null;
-  const nameScinematographer_val = nameScinematographer || null;
-  const lightingDesigner_val = lightingDesigner || null;
-  const nameSlightingDesigner_val = nameSlightingDesigner || null;
-  const makeUpArtist_val = makeUpArtist || null;
-  const nameSmakeUpArtist_val = nameSmakeUpArtist || null;
-  const setPlace_val = setPlace || null;
-  const nameSsetPlace_val = nameSsetPlace || null;
-  const costumeDesigner_val = costumeDesigner || null;
-  const nameScostumeDesigner_val = nameScostumeDesigner || null;
-  const fieldSpesialEffectDesigner_val = fieldSpesialEffectDesigner || null;
-  const nameSfieldSpesialEffectDesigner_val = nameSfieldSpesialEffectDesigner || null;
-  const visualEffectDseigner_val = visualEffectDseigner || null;
-  const nameSvisualEffectDseigner_val = nameSvisualEffectDseigner || null;
-  const edit_val = edit || null;
-  const nameSedit_val = nameSedit || null;
-  const otherFactor_val = otherFactor || null;
-  const nameSotherFactor_val = nameSotherFactor || null;
-  const cameraCount_val = cameraCount || null;
-  const cameraModel_val = cameraModel || null;
-  const lightingCount_val = lightingCount || null;
-  const lightingModel_val = lightingModel || null;
-  const moveMentEquipmentCranes_val = moveMentEquipmentCranes || null;
-  const moveMentEquipmentHelishot_val = moveMentEquipmentHelishot || null;
-  const moveMentEquipmentRonin_val = moveMentEquipmentRonin || null;
-  const moveMentEquipmentRail_val = moveMentEquipmentRail || null;
-  const otherEquipment_val = otherEquipment || null;
-  const orginalPrice_val = orginalPrice || null;
-  const discountPrice_val = discountPrice || null;
-  // ذخیره اطلاعات ویدیو در پایگاه داده
-  db.query(
-    `INSERT INTO video_upload (
+
+  const query = `
+    INSERT INTO video_upload (
        user_id, title, filepathImage, createat, isShow, tozihat, likeproduct, type, director, nameSdirector,
       actor, nameSactor, senarioWriter, nameSsenarioWriter,
       productionManager, nameSproductionManager, cinematographer,
       nameScinematographer, lightingDesigner, nameSlightingDesigner,
       makeUpArtist, nameSmakeUpArtist, setPlace, nameSsetPlace,
       costumeDesigner, nameScostumeDesigner, fieldSpesialEffectDesigner,
-      nameSfieldSpesialEffectDesigner, visualEffectDseigner,
-      nameSvisualEffectDseigner, edit, nameSedit, otherFactor,
+      nameSfieldSpesialEffectDesigner, visualEffectDesigner,
+      nameSvisualEffectDesigner, edit, nameSedit, otherFactor,
       nameSotherFactor, cameraCount, cameraModel, lightingCount,
       lightingModel, moveMentEquipmentCranes, moveMentEquipmentHelishot,
       moveMentEquipmentRonin, moveMentEquipmentRail, otherEquipment,
       orginalPrice, discountPrice, demoVideofile
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      user_id_val,
-      title_val,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  try {
+    const connection = await pool.getConnection();
+    await connection.query(query, [
+      user_id || null,
+      title || null,
       filepathImage,
-      createat, 
-      0, 
-      tozihat_val,
-      likeproduct_val,
-      type_val,
-      director_val,
-      nameSdirector_val,
-      actor_val,
-      nameSactor_val,
-      senarioWriter_val,
-      nameSsenarioWriter_val,
-      productionManager_val,
-      nameSproductionManager_val,
-      cinematographer_val,
-      nameScinematographer_val,
-      lightingDesigner_val,
-      nameSlightingDesigner_val,
-      makeUpArtist_val,
-      nameSmakeUpArtist_val,
-      setPlace_val,
-      nameSsetPlace_val,
-      costumeDesigner_val,
-      nameScostumeDesigner_val,
-      fieldSpesialEffectDesigner_val,
-      nameSfieldSpesialEffectDesigner_val,
-      visualEffectDseigner_val,
-      nameSvisualEffectDseigner_val,
-      edit_val,
-      nameSedit_val,
-      otherFactor_val,
-      nameSotherFactor_val,
-      cameraCount_val,
-      cameraModel_val,
-      lightingCount_val,
-      lightingModel_val,
-      moveMentEquipmentCranes_val,
-      moveMentEquipmentHelishot_val,
-      moveMentEquipmentRonin_val,
-      moveMentEquipmentRail_val,
-      otherEquipment_val,
-      orginalPrice_val,
-      discountPrice_val,
+      createat,
+      0, // Assuming isShow is set to 0 by default
+      tozihat || null,
+      likeproduct || null,
+      type || null,
+      director || null,
+      nameSdirector || null,
+      actor || null,
+      nameSactor || null,
+      senarioWriter || null,
+      nameSsenarioWriter || null,
+      productionManager || null,
+      nameSproductionManager || null,
+      cinematographer || null,
+      nameScinematographer || null,
+      lightingDesigner || null,
+      nameSlightingDesigner || null,
+      makeUpArtist || null,
+      nameSmakeUpArtist || null,
+      setPlace || null,
+      nameSsetPlace || null,
+      costumeDesigner || null,
+      nameScostumeDesigner || null,
+      fieldSpesialEffectDesigner || null,
+      nameSfieldSpesialEffectDesigner || null,
+      visualEffectDesigner || null,
+      nameSvisualEffectDesigner || null,
+      edit || null,
+      nameSedit || null,
+      otherFactor || null,
+      nameSotherFactor || null,
+      cameraCount || null,
+      cameraModel || null,
+      lightingCount || null,
+      lightingModel || null,
+      moveMentEquipmentCranes || null,
+      moveMentEquipmentHelishot || null,
+      moveMentEquipmentRonin || null,
+      moveMentEquipmentRail || null,
+      otherEquipment || null,
+      orginalPrice || null,
+      discountPrice || null,
       relativeVideoPath
-    ],
-    (err, result) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ error: 'Database error', details: err.message });
-      }
-      
-      res.json({
-        success: true,
-        message: "Video uploaded successfully",
-        videoId: result.insertId,
-        filePath: filepathImage,
-        videoPath: relativeVideoPath 
-      });
-    }
-  );
+    ]);
+    connection.release();
+    res.json({
+      success: true,
+      message: "Video uploaded successfully",
+      filePath: filepathImage,
+      videoPath: relativeVideoPath
+    });
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
 
-app.get("/video/joinUser", (req, res) => {
-  db.query(
-    `SELECT 
+// Get video uploads along with user details
+app.get("/video/joinUser", async (req, res) => {
+  const query = `
+    SELECT 
       u.userID,
       u.username,
       u.email,
@@ -810,86 +767,106 @@ app.get("/video/joinUser", (req, res) => {
       v.type,
       v.orginalPrice,
       v.discountPrice,
-      v.post_id,
-      v.isShow
+      v.post_id
     FROM 
       video_upload v
     JOIN 
       users u 
     ON 
-      v.user_id = u.userID`, 
-    
-    (err, results) => {
-      if (err) return res.status(500).send(err);
-      res.json(results);
-    }
-  );
-});
+      v.user_id = u.userID`;
 
-// خواندن همه ویدئوها
-
-app.get("/videos", (req, res) => {
-  db.query("SELECT * FROM video_upload", (err, results) => {
-    if (err) return res.status(500).send(err);
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(query);
+    connection.release();
     res.json(results);
-  });
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
 
-//روت برای تک ویدیو
-app.get("/videos/:id", (req, res) => {
-  const  post_id = req.params.id;
-  console.log(post_id)
-  db.query(
-    `SELECT 
-    v.user_id,
-    v.title,
-    u.username,
-    v.createat,
-    v.isShow,
-    v.tozihat,
-    v.type,
-    v.orginalPrice,
-    v.discountPrice,
-    v.post_id,
-    v.isShow
-  FROM 
-    video_upload v
-  JOIN 
-    users u 
-  ON 
-    v.user_id = u.userID
-
-    WHERE user_id = ?
-    `  ,
-    [post_id],
-    (err,result) => {
-      if (err) return res.status(500).send(err);
-      res.send(result);
-    }
-  );
-});
-
-//روت برای تایید ادمین
-app.put("/videoConfirmAdmin/:post_id", (req, res) => {
-  const { post_id } = req.params;
+// Get all videos
+app.get("/videos", async (req, res) => {
+  const query = "SELECT * FROM video_upload";
   
-  db.query(
-    "UPDATE video_upload SET isShow = ? WHERE post_id = ?", 
-    [1, post_id], 
-    (err) => {
-      if (err) return res.status(500).send(err);
-      res.send("ویدیو با موفیقت تایید شد");
-    }
-  );
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(query);
+    connection.release();
+    res.json(results);
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
 
-// حذف ویدئو
-app.delete("/video/:id", (req, res) => {
-  const { id } = req.params;
-  db.query("DELETE FROM video_upload WHERE video_id = ?", [id], (err) => {
-    if (err) return res.status(500).send(err);
+// Get a single video by ID
+app.get("/videos/:id", async (req, res) => {
+  const user_id = req.params.id;
+  const query = `
+    SELECT 
+      v.user_id,
+      v.title,
+      v.createat,
+      v.isShow,
+      v.likeproduct,
+      v.tozihat,
+      v.type,
+      v.orginalPrice,
+      v.discountPrice,
+      v.post_id
+    FROM 
+      video_upload v
+    JOIN 
+      users u 
+    ON 
+      v.user_id = u.userID
+    WHERE 
+      v.user_id = ?`;
+
+  try {
+    const connection = await pool.getConnection();
+    const [result] = await connection.query(query, [user_id]);
+    connection.release();
+    res.json(result);
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Confirm video by admin
+app.put("/videoConfirmAdmin/:post_id", async (req, res) => {
+  const post_id = req.params.post_id;
+  
+  const query = "UPDATE video_upload SET isShow = ? WHERE post_id = ?";
+
+  try {
+    const connection = await pool.getConnection();
+    await connection.query(query, [1, post_id]);
+    connection.release();
+    res.send("ویدیو با موفقیت تایید شد");
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Delete a video
+app.delete("/video/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = "DELETE FROM video_upload WHERE post_id = ?";
+
+  try {
+    const connection = await pool.getConnection();
+    await connection.query(query, [id]);
+    connection.release();
     res.send("Video deleted successfully");
-  });
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
 
 
