@@ -98,8 +98,8 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    // const response = await axios.post(`${ServerURL()}video-upload`, fd, {
-    const response = await axios.post(`http://localhost:3000/video_upload`, fd, {
+    const response = await axios.post(`${ServerURL()}video-upload`, fd, {
+    // const response = await axios.post(`http://localhost:3000/video_upload`, fd, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

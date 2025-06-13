@@ -17,8 +17,8 @@ console.log(videoList)
   const tokenUserId = localStorage.getItem("userId")
   const GetVideoFromDb = async () => {
     try {
-      // const url = `${ServerURL()}videos/${tokenUserId}`;
-      const url = `http://localhost:3000/videos/${tokenUserId}`;
+      const url = `${ServerURL()}videos/${tokenUserId}`;
+      // const url = `http://localhost:3000/videos/${tokenUserId}`;
       const res = await axios.get(url);
       setVideoList(res.data);
     } catch (error) {
