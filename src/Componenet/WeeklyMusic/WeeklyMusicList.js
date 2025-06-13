@@ -179,7 +179,7 @@ const WeeklyMusicList = () => {
                           whileTap={{ scale: 0.95 }}
                           onClick={() => {
                             dispatch(getOneMusicInfo(musicList[currentSlide + i]));
-                            navigate('/product');
+                            navigate(`/product/${a.type}`);
                           }}
                           className="px-4 py-2 bg-black hover:bg-green-700  text-white font-medium rounded-lg transition-colors"
                         >

@@ -8,28 +8,23 @@ import Login from "../src/Componenet/Auth/Login/Login";
 import SignUp from "../src/Componenet/Auth/SignUp/SignUp";
 import HomePage from "./Componenet/HomePage/HomePage";
 import Product from "./Componenet/Product/Product";
-import Test from "./Componenet/Test/Test";
-import VideoPlayer from "./Componenet/Test/VideoPlayeNEwr";
-import VideoUpload from "./Componenet/Test/VideoPost";
+import VideoPlayer from "./Componenet/VideoPlayer/VideoPlayeNEwr";
 import Card from "./Componenet/Card/Card";
 import UpNav from "./Componenet/UpNav/UpNav";
-import Slider from "./Componenet/Comp/Slider";
 import MusicPlayer from "./Componenet/MusicPlayer/MusicPlayer";
-import Cart from "./Componenet/Comp/Cart";
 import Dashbord from "./Componenet/Dashboard/Dashbord";
 import Rules from "./Componenet/UpNav/Comp/Rules";
 import Tarafe from "./Componenet/UpNav/Comp/Tarafe";
 import Course from "./Componenet/UpNav/Comp/Course";
 import ScrollTop from "./Componenet/Comp/ScrollTop";
 import OneUser from "./Componenet/Dashboard/AdminDashboard/Items/OneUserInfo/OneUser";
-import Ticket from "./Componenet/Dashboard/Main/Component/Ticket/Ticket";
+import Graphicplayer from "./Componenet/GraphicPlayer/Graphicplayer";
 import Lottie from "react-lottie-player";
 import AnimationLottie from "./AnimationLottie.json";
 import { Routes, Route, useLocation, Navigate } from "react-router";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 function App() {
-  const auth = useSelector((state) => state.user);
   const playMusic = useSelector((state) => state.playMusic);
   const urlMusicFile = useSelector((state) => state.urlMusicFile);
   const { cart }=useSelector((state)=>state.cartLit)
@@ -87,26 +82,23 @@ function App() {
             <ScrollTop />
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/product/:Items" element={<Product />} />
-              <Route path="/musicPlayer" element={<MusicPlayer />} />
+              <Route path="/product/:id" element={<Product />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/test" element={<Test />} />
               <Route path="/dashbord/*" element={<Dashbord />} />
-              <Route path="/cart" element={<Cart />} />
               <Route path="/rules" element={<Rules />} />
               <Route path="/tarafe" element={<Tarafe />} />
               <Route path="/Card" element={<Card />} />
               <Route path="/course" element={<Course />} />
               <Route path="/dashbord/OneUser/:id" element={<OneUser />} />
-              <Route path="/VideoPlayer" element={<VideoPlayer />} />
+              <Route path="/VideoPlayer/:id" element={<VideoPlayer />} />
+              <Route path="/Graphicplayer/:id" element={<Graphicplayer />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/about" element={<About />} />
               <Route path="/news" element={<News />} />
-              <Route path="/slider" element={<Slider />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>
-          <div>{playMusic ? <Test infoOneMusic={urlMusicFile} /> : null}</div>
+          <div>{playMusic ? <MusicPlayer infoOneMusic={urlMusicFile} /> : null}</div>
         </>
       ) : (
         <div className="bg-black h-screen text-cyan-50">

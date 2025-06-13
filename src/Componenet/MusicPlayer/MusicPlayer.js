@@ -5,46 +5,42 @@ import SkipNextSharpIcon from "@mui/icons-material/SkipNextSharp";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded";
 import { PiHeadCircuitFill } from "react-icons/pi";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import { BiDownload } from "react-icons/bi";
 import { MdStarRate } from "react-icons/md";
-import axios from "axios";
+import { useDispatch } from "react-redux";
+import { FaRegArrowAltCircleUp } from "react-icons/fa";
+import { FaRegArrowAltCircleDown } from "react-icons/fa";
+import {  showMusicplayer } from "../StateManagement/Action";
 import ServerURL from "../API/ServerURL";
-const MusicPlayer = () => {
+const MusicPlayer = ({infoOneMusic}) => {
   const [musicList, setMusicList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(true);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [show, setShow] = useState(true);
   const [number, setNumber] = useState(0);
-  const [urlFinal, setUrlFinal] = useState("");
+  const dispatch=useDispatch();
+  const baseUrl = ServerURL();
+  // const baseUrl = "http://localhost:3000/";
+  const urlFinal = baseUrl + (infoOneMusic.file_pathtagMP3||infoOneMusic.file_pathMP3Orginal);
   const audioRef = useRef(null);
+ 
 
   function formatDuration(duration) {
-    if (typeof duration !== 'number' || isNaN(duration) || duration < 0) return '0.00';
+    if (typeof duration !== "number" || isNaN(duration) || duration < 0)
+      return "0.00";
     const minutes = Math.floor(duration / 60);
     const seconds = Math.floor(duration % 60);
-    return minutes+":"+seconds.toString().padStart(2, '0')
-  };
+    return minutes + ":" + seconds.toString().padStart(2, "0");
+  }
 
-const finalDuration=formatDuration(duration)
-
-
-
-  const baseUrl = ServerURL();
-  const GetDataFromDb = async () => {
-    try {
-      const url = `${ServerURL()}musics`;
-      const res = await axios.get(url);
-      setMusicList(res.data);
-      setLoading(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const finalDuration = formatDuration(duration);
 
   const handleseek = (e) => {
     const seekTime = parseFloat(e.target.value); // تبدیل به عدد
-    
+
     if (!isNaN(seekTime) && audioRef.current) {
       audioRef.current.currentTime = seekTime; // اعمال زمان جستجو
       setCurrentTime(seekTime); // به روز رسانی currentTime
@@ -57,7 +53,7 @@ const finalDuration=formatDuration(duration)
   };
 
   const handleplay = () => {
-    audioRef.current.play()
+    audioRef.current.play();
   };
 
   const handlepause = () => {
@@ -65,26 +61,13 @@ const finalDuration=formatDuration(duration)
   };
 
   useEffect(() => {
-    if (musicList && musicList.length > 0) {
-      const filePath = musicList[number].file_pathtagMP3; // Use optional chaining
-      
-
-      if (filePath) {
-        const fixedPath = filePath.replace(/\\/g, "/");
-
-        const cleanedPath = fixedPath.replace(/^"|"$/g, "");
-
-        const newUrl = baseUrl + cleanedPath;
-
-        setUrlFinal(newUrl);
-      }
-    } 
+    
     const audioElement = audioRef.current;
     if (audioRef.current) {
       audioRef.current.pause();
       setShow(true);
     }
-    GetDataFromDb();
+ 
 
     if (audioElement) {
       audioElement.addEventListener("timeupdate", handleTimeUpdate);
@@ -103,26 +86,36 @@ const finalDuration=formatDuration(duration)
     }
   };
 
+
   const handleSkipNext = () => {
     if (number < musicList.length - 1) {
       setNumber((last) => last + 1);
     }
   };
 
+
   return (
-    <div className="fixed bottom-1 right-2 -left-2  py-2 px-4 w-screen">
-      <div className=" h-24 gap-4 flex flex-row bg-zinc-950 rounded-lg shadow-inner shadow-purple-800 text-white place-items-center">
-        {loading ? (
-          <>
-            <div className="flex p-2 justify-center  basis-1/4">
+    <div className={`fixed bottom-1 ${showPlayer ? "h-24" : "h-8"} right-2 -left-2 py-2 px-4 w-screen transition-all duration-500`}>
+    <div className={`h-24 gap-4 flex flex-row ${showPlayer ? " bg-zinc-950" : " bg-transparent "}  rounded-lg shadow-inner shadow-purple-800 text-white place-items-center transition-all duration-500`}>
+      {!loading ? (
+        <>
+          <div className="flex p-2 justify-between basis-1/4">
+            <div className="flex p-2 gap-4 justify-between">
+              <IoIosCloseCircleOutline size={20} onClick={() => dispatch(showMusicplayer(true))} />
+              {showPlayer ? (
+                <FaRegArrowAltCircleUp onClick={() => setShowPlayer(p => !p)} className="mb-12" size={20} />
+              ) : (
+                <FaRegArrowAltCircleDown onClick={() => setShowPlayer(p => !p)} className="mb-12" size={20} />
+              )}
+            </div>
               <img
                 className="rounded-lg h-20 w-20"
-                src={musicList[number].file_pathImage}
-                alt={musicList[number].title}
+                src={baseUrl+infoOneMusic.file_pathImage}
+                alt={infoOneMusic.title}
               />
             </div>
             <div className="basis-2/4 ">
-              {/* {newmusiclist[number].title} */}
+              {/* {infoOneMusic.title} */}
               <div className="flex flex-col">
                 <div>
                   <Slider
@@ -130,7 +123,7 @@ const finalDuration=formatDuration(duration)
                     onChange={handleseek}
                     type="range"
                     min={0}
-                    max={Number.isNaN(duration) ? "0.00" :duration}
+                    max={Number.isNaN(duration) ? "0.00" : duration}
                     value={currentTime}
                   />
                 </div>
@@ -170,7 +163,9 @@ const finalDuration=formatDuration(duration)
                     onClick={handleSkipNext}
                     className="basis-1/5"
                   ></SkipNextSharpIcon>
-                  <div className="basis-1/5">{Number.isNaN(duration) ? "0.00" : finalDuration}</div>
+                  <div className="basis-1/5">
+                    {Number.isNaN(duration) ? "0.00" : finalDuration}
+                  </div>
                 </div>
               </div>
             </div>
@@ -187,9 +182,9 @@ const finalDuration=formatDuration(duration)
                   </div>
                 </div>
                 <div>
-                  <div className="mr-3">{musicList[number].title}</div>
-                  <div className="mr-3">{musicList[number].tempo}</div>
-                  {/* <div className="mr-3">{name[number].rate}</div> */}
+                  <div className="mr-3">{infoOneMusic.title}</div>
+                  <div className="mr-3">{infoOneMusic.tempo}</div>
+                  <div className="mr-3">{infoOneMusic.view}</div>
                 </div>
               </div>
             </div>
