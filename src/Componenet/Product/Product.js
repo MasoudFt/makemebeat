@@ -10,7 +10,7 @@ const Product = () => {
   const OneMusicInfo=useSelector((state)=>state.MusicInfo)
   return (
     <>
-      <div className="h-full grid grid-flow-col grid-rows-3 bg-zinc-950 gap-4 mt-32 p-4">
+      <div className="h-full grid grid-flow-col grid-rows-3 bg-zinc-950 gap-4  p-4">
         <SectionLeft OneMusicInfo={OneMusicInfo}/>
         <div className=" p-4 row-span-3 rounded-lg col-span-10 bg-zinc-950 ">
           <div className="">

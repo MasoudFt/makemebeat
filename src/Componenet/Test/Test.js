@@ -1,3 +1,204 @@
+// import React, { useState, useRef, useEffect } from "react";
+// import Slider from "@mui/material/Slider";
+// import SkipPreviousSharpIcon from "@mui/icons-material/SkipPreviousSharp";
+// import SkipNextSharpIcon from "@mui/icons-material/SkipNextSharp";
+// import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+// import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded";
+// import { PiHeadCircuitFill } from "react-icons/pi";
+// import { IoIosCloseCircleOutline } from "react-icons/io";
+// import { BiDownload } from "react-icons/bi";
+// import { MdStarRate } from "react-icons/md";
+// import { useDispatch } from "react-redux";
+// import { FaRegArrowAltCircleUp } from "react-icons/fa";
+// import { FaRegArrowAltCircleDown } from "react-icons/fa";
+// import {  showMusicplayer } from "../StateManagement/Action";
+// import ServerURL from "../API/ServerURL";
+
+// const Test = ({infoOneMusic}) => {
+//   const [musicList, setMusicList] = useState([]);
+//   const [loading, setLoading] = useState(false);
+//   const [showPlayer, setShowPlayer] = useState(true);
+//   const [duration, setDuration] = useState(0);
+//   const [currentTime, setCurrentTime] = useState(0);
+//   const [show, setShow] = useState(true);
+//   const [number, setNumber] = useState(0);
+//   const dispatch=useDispatch();
+//   const baseUrl = ServerURL();
+//   // const baseUrl = "http://localhost:3000/";
+//   const urlFinal = baseUrl + (infoOneMusic.file_pathtagMP3||infoOneMusic.file_pathMP3Orginal);
+//   const audioRef = useRef(null);
+ 
+
+//   function formatDuration(duration) {
+//     if (typeof duration !== "number" || isNaN(duration) || duration < 0)
+//       return "0.00";
+//     const minutes = Math.floor(duration / 60);
+//     const seconds = Math.floor(duration % 60);
+//     return minutes + ":" + seconds.toString().padStart(2, "0");
+//   }
+
+//   const finalDuration = formatDuration(duration);
+
+//   const handleseek = (e) => {
+//     const seekTime = parseFloat(e.target.value); // تبدیل به عدد
+
+//     if (!isNaN(seekTime) && audioRef.current) {
+//       audioRef.current.currentTime = seekTime; // اعمال زمان جستجو
+//       setCurrentTime(seekTime); // به روز رسانی currentTime
+//     }
+//   };
+
+//   const handleTimeUpdate = () => {
+//     setCurrentTime(audioRef.current.currentTime);
+//     setDuration(audioRef.current.duration);
+//   };
+
+//   const handleplay = () => {
+//     audioRef.current.play();
+//   };
+
+//   const handlepause = () => {
+//     audioRef.current.pause();
+//   };
+
+//   useEffect(() => {
+    
+//     const audioElement = audioRef.current;
+//     if (audioRef.current) {
+//       audioRef.current.pause();
+//       setShow(true);
+//     }
+ 
+
+//     if (audioElement) {
+//       audioElement.addEventListener("timeupdate", handleTimeUpdate);
+//     }
+
+//     return () => {
+//       if (audioElement) {
+//         audioElement.removeEventListener("timeupdate", handleTimeUpdate);
+//       }
+//     };
+//   }, [audioRef, number]);
+
+//   const handleSkipPrevious = () => {
+//     if (number > 0) {
+//       setNumber((last) => last - 1);
+//     }
+//   };
+
+
+//   const handleSkipNext = () => {
+//     if (number < musicList.length - 1) {
+//       setNumber((last) => last + 1);
+//     }
+//   };
+
+//   return (
+//     <div className={`fixed bottom-1 ${showPlayer ? "h-24" : "h-8"} right-2 -left-2 py-2 px-4 w-screen transition-all duration-500`}>
+//     <div className={`h-24 gap-4 flex flex-row ${showPlayer ? " bg-zinc-950" : " bg-transparent "}  rounded-lg shadow-inner shadow-purple-800 text-white place-items-center transition-all duration-500`}>
+//       {!loading ? (
+//         <>
+//           <div className="flex p-2 justify-between basis-1/4">
+//             <div className="flex p-2 gap-4 justify-between">
+//               <IoIosCloseCircleOutline size={20} onClick={() => dispatch(showMusicplayer(true))} />
+//               {showPlayer ? (
+//                 <FaRegArrowAltCircleUp onClick={() => setShowPlayer(p => !p)} className="mb-12" size={20} />
+//               ) : (
+//                 <FaRegArrowAltCircleDown onClick={() => setShowPlayer(p => !p)} className="mb-12" size={20} />
+//               )}
+//             </div>
+//               <img
+//                 className="rounded-lg h-20 w-20"
+//                 src={baseUrl+infoOneMusic.file_pathImage}
+//                 alt={infoOneMusic.title}
+//               />
+//             </div>
+//             <div className="basis-2/4 ">
+//               {/* {infoOneMusic.title} */}
+//               <div className="flex flex-col">
+//                 <div>
+//                   <Slider
+//                     style={{ color: "white" }}
+//                     onChange={handleseek}
+//                     type="range"
+//                     min={0}
+//                     max={Number.isNaN(duration) ? "0.00" : duration}
+//                     value={currentTime}
+//                   />
+//                 </div>
+//                 <div className="flex flex-row gap-4 p-2 ">
+//                   <div className="basis-1/5">
+//                     {Math.floor(currentTime / 60)}:
+//                     {Math.floor(currentTime % 60) < 10
+//                       ? "0" + Math.floor(currentTime % 60)
+//                       : Math.floor(currentTime % 60)}
+//                   </div>
+//                   <SkipPreviousSharpIcon
+//                     size={30}
+//                     onClick={handleSkipPrevious}
+//                     className="basis-1/5"
+//                   ></SkipPreviousSharpIcon>
+//                   {show ? (
+//                     <PlayCircleOutlineIcon
+//                       size={30}
+//                       onClick={() => {
+//                         handleplay();
+//                         setShow(false);
+//                       }}
+//                       className="basis-1/5"
+//                     ></PlayCircleOutlineIcon>
+//                   ) : (
+//                     <PauseCircleFilledRoundedIcon
+//                       size={30}
+//                       onClick={() => {
+//                         handlepause();
+//                         setShow(true);
+//                       }}
+//                       className="basis-1/5"
+//                     ></PauseCircleFilledRoundedIcon>
+//                   )}
+//                   <SkipNextSharpIcon
+//                     size={30}
+//                     onClick={handleSkipNext}
+//                     className="basis-1/5"
+//                   ></SkipNextSharpIcon>
+//                   <div className="basis-1/5">
+//                     {Number.isNaN(duration) ? "0.00" : finalDuration}
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//             <div dir="rtl" className="flex flex-col basis-1/4">
+//               <div className="flex justify-center flex-row ">
+//                 <div className="basis-1/4">
+//                   <PiHeadCircuitFill size={25} />
+
+//                   <div className="basis-2/3">
+//                     <BiDownload size={25} />
+//                   </div>
+//                   <div className="basis-2/3">
+//                     <MdStarRate size={25} />
+//                   </div>
+//                 </div>
+//                 <div>
+//                   <div className="mr-3">{infoOneMusic.title}</div>
+//                   <div className="mr-3">{infoOneMusic.tempo}</div>
+//                   <div className="mr-3">{infoOneMusic.view}</div>
+//                 </div>
+//               </div>
+//             </div>
+//             <audio ref={audioRef} src={urlFinal} />
+//           </>
+//         ) : (
+//           "loading..."
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Test;
 import React, { useState, useRef, useEffect } from "react";
 import Slider from "@mui/material/Slider";
 import SkipPreviousSharpIcon from "@mui/icons-material/SkipPreviousSharp";
@@ -11,40 +212,46 @@ import { MdStarRate } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { FaRegArrowAltCircleUp } from "react-icons/fa";
 import { FaRegArrowAltCircleDown } from "react-icons/fa";
-import {  showMusicplayer } from "../StateManagement/Action";
+import { showMusicplayer } from "../StateManagement/Action";
 import ServerURL from "../API/ServerURL";
 
-const Test = ({infoOneMusic}) => {
-  const [musicList, setMusicList] = useState([]);
+const MusicPlayer = ({ infoOneMusic }) => {
+  const [musicmusicList, setMusicList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPlayer, setShowPlayer] = useState(true);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState (true);
   const [number, setNumber] = useState(0);
-  const dispatch=useDispatch();
+  const [volume, setVolume] = useState(0.7);
+  const dispatch = useDispatch();
   const baseUrl = ServerURL();
-  // const baseUrl = "http://localhost:3000/";
-  const urlFinal = baseUrl + (infoOneMusic.file_pathtagMP3||infoOneMusic.file_pathMP3Orginal);
+  const urlFinal = baseUrl + (infoOneMusic.file_pathtagMP3 || infoOneMusic.file_pathMP3Orginal);
   const audioRef = useRef(null);
- 
 
   function formatDuration(duration) {
     if (typeof duration !== "number" || isNaN(duration) || duration < 0)
-      return "0.00";
+      return "0:00";
     const minutes = Math.floor(duration / 60);
     const seconds = Math.floor(duration % 60);
-    return minutes + ":" + seconds.toString().padStart(2, "0");
+    return `${minutesminutes}:${seconds.toString().padStart(2, "0")}`;
   }
 
   const finalDuration = formatDuration(duration);
 
-  const handleseek = (e) => {
-    const seekTime = parseFloat(e.target.value); // تبدیل به عدد
-
+  const handleSeek = (e, newValue) => {
+    const seekTime = parseFloat(newValue);
     if (!isNaN(seekTime) && audioRef.current) {
-      audioRef.current.currentTime = seekTime; // اعمال زمان جستجو
-      setCurrentTime(seekTime); // به روز رسانی currentTime
+      audioRef.current.currentTime = seekTime;
+      setCurrentTime(seekTime);
+    }
+  };
+
+  const handleVolumeChange = (e, newValue) => {
+    const newVolume = parseFloat(newValue);
+    if (!isNaN(newVolume) && audioRef.current) {
+      audioRef.current.volume = newVolume;
+      setVolume(newVolume);
     }
   };
 
@@ -53,33 +260,14 @@ const Test = ({infoOneMusic}) => {
     setDuration(audioRef.current.duration);
   };
 
-  const handleplay = () => {
-    audioRef.current.play();
-  };
-
-  const handlepause = () => {
-    audioRef.current.pause();
-  };
-
-  useEffect(() => {
-    
-    const audioElement = audioRef.current;
-    if (audioRef.current) {
+  const togglePlay = () => {
+    if (show) {
+      audioRef.current.play();
+    } else {
       audioRef.current.pause();
-      setShow(true);
     }
- 
-
-    if (audioElement) {
-      audioElement.addEventListener("timeupdate", handleTimeUpdate);
-    }
-
-    return () => {
-      if (audioElement) {
-        audioElement.removeEventListener("timeupdate", handleTimeUpdate);
-      }
-    };
-  }, [audioRef, number]);
+    setShow(!show);
+  };
 
   const handleSkipPrevious = () => {
     if (number > 0) {
@@ -87,115 +275,222 @@ const Test = ({infoOneMusic}) => {
     }
   };
 
-
   const handleSkipNext = () => {
     if (number < musicList.length - 1) {
       setNumber((last) => last + 1);
     }
   };
 
+  useEffect(() => {
+    const audioElement = audioRef.current;
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+      audioRef.current.pause();
+      setShow(true);
+    }
+
+    if (audioElement) {
+      audioElement.addEventListener("timeupdate", handleTimeUpdate);
+      audioElement.addEventListener("ended", () => {
+        setShow(true);
+        if (number < musicList.length - 1) {
+          handleSkipNext();
+        }
+      });
+    }
+
+    return () => {
+      if (audioElement) {
+        audioElement.removeEventListener("timeupdate", handleTimeUpdate);
+        audioElement.removeEventListener("ended", () => {});
+      }
+    };
+  }, [audioRef, number]);
+
   return (
-    <div className={`fixed bottom-1 ${showPlayer ? "h-24" : "h-8"} right-2 -left-2 py-2 px-4 w-screen transition-all duration-500`}>
-    <div className={`h-24 gap-4 flex flex-row ${showPlayer ? " bg-zinc-950" : " bg-transparent "}  rounded-lg shadow-inner shadow-purple-800 text-white place-items-center transition-all duration-500`}>
-      {!loading ? (
-        <>
-          <div className="flex p-2 justify-between basis-1/4">
-            <div className="flex p-2 gap-4 justify-between">
-              <IoIosCloseCircleOutline size={20} onClick={() => dispatch(showMusicplayer(true))} />
-              {showPlayer ? (
-                <FaRegArrowAltCircleUp onClick={() => setShowPlayer(p => !p)} className="mb-12" size={20} />
-              ) : (
-                <FaRegArrowAltCircleDown onClick={() => setShowPlayer(p => !p)} className="mb-12" size={20} />
+    <div
+      className={`fixed bottom-0 ${
+        showPlayer ? "h-28 md:h-32" : "h-10"
+      } left-0 right-0 py-2 px-4 w-full transition-all duration-300 ease-in-out z-50`}
+    >
+      <div
+        className={`h-full gap-2 md:gap-4 flex flex-row ${
+          showPlayer
+            ? "bg-gradient-to-r from-gray-900 to-purple-900"
+            : "bg-transparent"
+        } rounded-t-lg shadow-lg shadow-purple-900/50 text-white items-center transition-all duration-300 ease-in-out`}
+      >
+        {!loading ? (
+          <>
+            {/* Album Art and Controls */}
+            <div className="flex items-center p-1 md:p-2 w-1/4 md:w-1/5">
+              <div className="flex flex-col items-center mr-2 md:mr-4">
+                <div className="flex space-x-2 mb-1">
+                  <button
+                    onClick={() => dispatch(showMusicplayer(true))}
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    <IoIosCloseCircleOutline size={20} />
+                  </button>
+                  <button
+                    onClick={() => setShowPlayer((p) => !p)}
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    {showPlayer ? (
+                      <FaRegArrowAltCircleUp size={20} />
+                    ) : (
+                      <FaRegArrowAltCircleDown size={20} />
+                    )}
+                  </button>
+                </div>
+                <img
+                  className={`rounded-lg ${
+                    showPlayer ? "h-16 w-16 md:h-20 md:w-20" : "h-0 w-0"
+                  } object-cover transition-all duration-300`}
+                  src={baseUrl + infoOneMusic.file_pathImage}
+                  alt={infoOneMusic.title}
+                />
+              </div>
+            </div>
+
+            {/* Main Player Controls */}
+            <div className="flex flex-col flex-grow px-2 md:px-4">
+              {showPlayer && (
+                <>
+                  <div className="w-full">
+                    <Slider
+                      value={currentTime}
+                      min={0}
+                      max={duration || 100}
+                      onChange={handleSeek}
+                      sx={{
+                        color: "#a855f7",
+                        height: 4,
+                        "& .MuiSlider-thumb": {
+                          width: 12,
+                          height: 12,
+                          transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
+                          "&:hover, &.Mui-focusVisible": {
+                            boxShadow: "0px 0px 0px 8px rgba(168, 85, 247, 0.16)",
+                          },
+                          "&.Mui-active": {
+                            width: 16,
+                            height: 16,
+                          },
+                        },
+                        "& .MuiSlider-rail": {
+                          opacity: 0.5,
+                          backgroundColor: "#4b5563",
+                        },
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs md:text-sm text-gray-300 w-12">
+                      {formatDuration(currentTime)}
+                    </span>
+                    <div className="flex items-center space-x-3 md:space-x-6">
+                      <button
+                        onClick={handleSkipPrevious}
+                        className="text-gray-300 hover:text-purple-400 transition-colors"
+                      >
+                        <SkipPreviousSharpIcon fontSize="medium" />
+                      </button>
+                      <button
+                        onClick={togglePlay}
+                        className="text-white hover:text-purple-400 transition-colors"
+                      >
+                        {show ? (
+                          <PlayCircleOutlineIcon fontSize="large" />
+                        ) : (
+                          <PauseCircleFilledRoundedIcon fontSize="large" />
+                        )}
+                      </button>
+                      <button
+                        onClick={handleSkipNext}
+                        className="text-gray-300 hover:text-purple-400 transition-colors"
+                      >
+                        <SkipNextSharpIcon fontSize="medium" />
+                      </button>
+                    </div>
+                    <span className="text-xs md:text-sm text-gray-300 w-12 text-right">
+                      {Number.isNaN(duration) ? "0:00" : finalDuration}
+                    </span>
+                  </div>
+                </>
               )}
             </div>
-              <img
-                className="rounded-lg h-20 w-20"
-                src={baseUrl+infoOneMusic.file_pathImage}
-                alt={infoOneMusic.title}
-              />
-            </div>
-            <div className="basis-2/4 ">
-              {/* {infoOneMusic.title} */}
-              <div className="flex flex-col">
-                <div>
+
+            {/* Track Info and Additional Controls */}
+            {showPlayer && (
+              <div className="hidden md:flex flex-col items-end w-1/4">
+                <div className="flex items-center space-x-4 mb-2">
+                  <button className="text-gray-300 hover:text-purple-400 transition-colors">
+                    <PiHeadCircuitFill size={20} />
+                  </button>
+                  <button className="text-gray-300 hover:text-purple-400 transition-colors">
+                    <BiDownload size={20} />
+                  </button>
+                  <button className="text-gray-300 hover:text-purple-400 transition-colors">
+                    <MdStarRate size={20} />
+                  </button>
+                </div>
+                <div className="text-right">
+                  <h3 className="text-sm font-semibold truncate max-w-[200px]">
+                    {infoOneMusic.title}
+                  </h3>
+                  <p className="text-xs text-gray-400">{infoOneMusic.tempo}</p>
+                  <p className="text-xs text-gray-400">{infoOneMusic.view} plays</p>
+                </div>
+                <div className="mt-2 w-full max-w-[120px]">
                   <Slider
-                    style={{ color: "white" }}
-                    onChange={handleseek}
-                    type="range"
+                    value={volume}
                     min={0}
-                    max={Number.isNaN(duration) ? "0.00" : duration}
-                    value={currentTime}
+                    max={1}
+                    step={0.01}
+                    onChange={handleVolumeChange}
+                    sx={{
+                      color: "#a855f7",
+                      height: 4,
+                      "& .MuiSlider-thumb": {
+                        width: 10,
+                        height: 10,
+                      },
+                    }}
                   />
                 </div>
-                <div className="flex flex-row gap-4 p-2 ">
-                  <div className="basis-1/5">
-                    {Math.floor(currentTime / 60)}:
-                    {Math.floor(currentTime % 60) < 10
-                      ? "0" + Math.floor(currentTime % 60)
-                      : Math.floor(currentTime % 60)}
-                  </div>
-                  <SkipPreviousSharpIcon
-                    size={30}
-                    onClick={handleSkipPrevious}
-                    className="basis-1/5"
-                  ></SkipPreviousSharpIcon>
-                  {show ? (
-                    <PlayCircleOutlineIcon
-                      size={30}
-                      onClick={() => {
-                        handleplay();
-                        setShow(false);
-                      }}
-                      className="basis-1/5"
-                    ></PlayCircleOutlineIcon>
-                  ) : (
-                    <PauseCircleFilledRoundedIcon
-                      size={30}
-                      onClick={() => {
-                        handlepause();
-                        setShow(true);
-                      }}
-                      className="basis-1/5"
-                    ></PauseCircleFilledRoundedIcon>
-                  )}
-                  <SkipNextSharpIcon
-                    size={30}
-                    onClick={handleSkipNext}
-                    className="basis-1/5"
-                  ></SkipNextSharpIcon>
-                  <div className="basis-1/5">
-                    {Number.isNaN(duration) ? "0.00" : finalDuration}
-                  </div>
-                </div>
               </div>
-            </div>
-            <div dir="rtl" className="flex flex-col basis-1/4">
-              <div className="flex justify-center flex-row ">
-                <div className="basis-1/4">
-                  <PiHeadCircuitFill size={25} />
+            )}
 
-                  <div className="basis-2/3">
-                    <BiDownload size={25} />
-                  </div>
-                  <div className="basis-2/3">
-                    <MdStarRate size={25} />
-                  </div>
+            {/* Mobile View - Collapsed */}
+            {!showPlayer && (
+              <div className="flex items-center justify-between w-full px-2">
+                <div className="flex items-center space-x-2">
+                  <button onClick={togglePlay} className="text-white">
+                    {show ? (
+                      <PlayCircleOutlineIcon fontSize="small" />
+                    ) : (
+                      <PauseCircleFilledRoundedIcon fontSize="small" />
+                    )}
+                  </button>
+                  <span className="text-sm truncate max-w-[150px]">
+                    {infoOneMusic.title}
+                  </span>
                 </div>
-                <div>
-                  <div className="mr-3">{infoOneMusic.title}</div>
-                  <div className="mr-3">{infoOneMusic.tempo}</div>
-                  <div className="mr-3">{infoOneMusic.view}</div>
-                </div>
+                <span className="text-xs text-gray-400">
+                  {formatDuration(currentTime)} / {finalDuration}
+                </span>
               </div>
-            </div>
+            )}
+
             <audio ref={audioRef} src={urlFinal} />
           </>
         ) : (
-          "loading..."
+          <div className="w-full text-center">Loading...</div>
         )}
       </div>
     </div>
   );
 };
 
-export default Test;
+export default MusicPlayer;

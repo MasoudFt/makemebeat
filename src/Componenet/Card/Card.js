@@ -28,14 +28,14 @@ useEffect(() => {
 }, [cart,userCartList])
 
   return (
-<div className="min-h-screen bg-zinc-950 p-6 mt-28">
+<div className="min-h-screen bg-zinc-950 p-6 ">
   <h1 className="text-3xl text-white font-bold mb-6 text-center">سبد خرید</h1>
      {alert && (
            <Stack dir="rtl" sx={{ width: "100%" }} spacing={2}>
              <Alert style={{color:'black',fontSize:"large",fontWeight:"bold",padding:"1%"}} severity="error">{alert}</Alert>
            </Stack>
          )}
-  <div dir="rtl" className="flex flex-col gap-3">
+  <div dir="rtl" className="flex flex-col gap-3 mt-16">
     <div className="flex-1 bg-black rounded-lg shadow p-4">
       <div className='flex text-center text-white font-semibold justify-around gap-2 mb-3 border-b pb-2'>
         <div className='w-fit'>ردیف</div>

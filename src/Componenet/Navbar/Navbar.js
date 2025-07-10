@@ -122,7 +122,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="top-10 mt-4 w-screen grid grid-cols-7 border border-l-zinc-950 border-b-stone-900 h-fit text-center fixed z-10 bg-zinc-950 items-center justify-between p-4">
+      {/* <div className="top-10 mt-4 w-screen grid grid-cols-7 border border-l-zinc-950 border-b-stone-900 h-fit text-center fixed z-10 bg-zinc-950 items-center justify-between p-4">
         <div
           onClick={() => navigate(SignIcon.path)}
           className="font-extrabold flex justify-between h-10 w-36 rounded-lg col-span-1 p-1 relative cursor-pointer before:content-[''] before:absolute before:w-[20px] before:h-[20px] before:transition-all after:content-[''] after:absolute after:w-[20px] after:h-[20px] after:transition-all before:top-[-5px] before:left-[-5px] before:border-t before:border-l before:border-purple-800 after:bottom-[-5px] after:right-[-5px] after:border-b after:border-r after:border-purple-800 before:hover:w-[calc(100%+9px)] before:hover:h-[calc(100%+9px)] after:hover:w-[calc(100%+9px)] after:hover:h-[calc(100%+9px)] text-white hover:cursor-pointer hover:text-blue-400"
@@ -190,7 +190,7 @@ const Navbar = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

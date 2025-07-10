@@ -55,7 +55,7 @@ const Dashbord = () => {
       {isAdmin ? (
         <AdminDashbord />
       ) : (
-        <div dir="rtl" className="grid grid-flow-row-dense grid-cols-5 p-1 gap-10">
+        <div dir="rtl" className="grid grid-flow-row-dense grid-cols-5 p-1 gap-10 ">
           <div className="col-span-1">
             <Sidebar
               profilepic={userInfo?.profile_path}
@@ -63,8 +63,8 @@ const Dashbord = () => {
               type={userInfo?.seller === 0}
             />
           </div>
-          <div className="col-span-4 mt-14">
-            <div className="grid grid-cols-2 flow-row">
+          <div className="col-span-4 mt-14 mb-5">
+            <div className="grid md:grid-cols-2 sm:grid-cols-1 flow-row">
               <div>
                 <Head type={userInfo?.seller === 0} />
               </div>
@@ -72,7 +72,7 @@ const Dashbord = () => {
                 <Head type={userInfo?.seller === 0} />
               </div>
             </div>
-            <div className="border-t-2 border-purple-600 rounded-lg mt-5">
+            <div className="border-t-2 border-purple-600 rounded-lg mt-5 h-screen">
               <Main />
             </div>
           </div>

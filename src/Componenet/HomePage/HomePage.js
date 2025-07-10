@@ -1,5 +1,4 @@
 import React from "react";
-
 import Slider from "../Comp/Slider";
 import Cart from "../Comp/Cart";
 import WeeklyMusicList from "../WeeklyMusic/WeeklyMusicList";
@@ -7,8 +6,7 @@ import Footer from "../Footer/Footer";
 import MotionGraphic from "../MotionGraphic/MotionGraphic";
 
 const HomePage = () => {
- 
-   const product = [
+  const product = [
     {
       id: 1,
       name: "Image1",
@@ -31,96 +29,86 @@ const HomePage = () => {
         "https://makemebeat.net/wp-content/uploads/2023/06/photo_2023-06-05_03-50-42-1024x1024.jpg",
     },
   ];
-   const product2 = [
+
+  const product2 = [
     {
       id: 1,
       name: "Image1",
-      ImagePath:"1.jpeg"
-      
+      ImagePath: "1.jpeg",
     },
     {
       id: 2,
       name: "Image2",
-      ImagePath:
-      "2.jpeg",
+      ImagePath: "2.jpeg",
     },
     {
       id: 3,
       name: "Image3",
-      ImagePath:
-      "3.jpeg",
+      ImagePath: "3.jpeg",
     },
     {
       id: 4,
       name: "Image4",
-      ImagePath:
-      "4.jpeg",
+      ImagePath: "4.jpeg",
+    },
+  ];
+
+  const sections = [
+    {
+      title: "پیشنهاد های ویژه",
+      component: <WeeklyMusicList />,
+    },
+    {
+      title: "سبک های انتخابی",
+      component: <Slider product={product} />,
+    },
+    {
+      title: "نمونه کارهای تصویری",
+      component: <Cart />,
+    },
+    {
+      title: "گرافیک دیزاین",
+      component: <Cart />,
+    },
+    {
+      title: "رادیو میک می بیت",
+      component: <Cart />,
+    },
+    {
+      title: "هنرمندهای رسمی سایت",
+      component: <Cart />,
+    },
+    {
+      title: "موشن گرافی",
+      component: <MotionGraphic />,
+    },
+    {
+      title: "مجله میک می بیت",
+      component: <Cart />,
     },
   ];
 
   return (
-    <>
-    
-      <div className=" h-full p-2 ">
-        <div className="mt-36 justify-center ">
-        <div className="h-full text-center text-cyan-50 font-bold ">
-            <Slider product={product2} />
+    <div className="h-full p-2 w-full overflow-hidden">
+      <div className="mt-36 justify-center">
+        <div className="h-full text-center text-cyan-50 font-bold">
+          <Slider product={product2} />
+        </div>
+        {sections.map((section, index) => (
+          <div key={index} className="h-full mb-32">
+            <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
+              {section.title}
+            </div>
+            <div className="h-full text-center text-cyan-50 font-bold py-5 px-5">
+              {section.component}
+            </div>
           </div>
-          <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-         پیشنهاد های ویژه
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <WeeklyMusicList />
-        </div>
-          <div className="h-18 mt-16 text-center text-3xl text-cyan-50 font-bold py-3 px-3">
-            سبک های انتخابی
-          </div>
-          <div className="h-full mt-16 text-center text-cyan-50 font-bold ">
-            <Slider product={product} />
-          </div>
-        </div>
-        <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-          نمونه کارهای تصویری
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <Cart />
-        </div>
-        <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-          گرافیک دیزاین
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <Cart />
-        </div>
-        <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-          رادیو میک می بیت
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <Cart />
-        </div>
-        <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-          هنرمندهای های رسمی سایت
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <Cart />
-        </div>
-        <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-          موشن گرافی
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <MotionGraphic />
-        </div>
-        <div className="h-18 text-center text-3xl text-cyan-50 font-bold py-5 px-5">
-          مجله میک می بیت
-        </div>
-        <div className="h-full text-center mb-32 text-cyan-50 font-bold py-5 px-5">
-          <Cart />
-        </div>
-        <div className="h-full text-center  text-cyan-50 font-bold ">
-          <Footer />
-        </div>
+        ))}
       </div>
-    
-    </>
+      <div className="h-full text-center text-cyan-50 font-bold">
+        <Footer />
+      </div>
+    </div>
   );
 };
 

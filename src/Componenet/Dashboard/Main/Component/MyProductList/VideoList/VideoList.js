@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { fetchImage } from "../../../../../StateManagement/Action";
-import { MdArrowCircleLeft } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { MdArrowCircleRight } from "react-icons/md";
 import ServerURL from "../../../../../API/ServerURL";
 
 const VideoList = () => {
