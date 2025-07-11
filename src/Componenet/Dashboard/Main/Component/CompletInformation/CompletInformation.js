@@ -60,7 +60,6 @@ const CompletInformation = () => {
             onChange={handleInputChange} 
             type={item.type}
             placeholder={item.label}
-            // className={`p-2 rounded-md border border-purple-600 bg-transparent focus:outline-none  transition-colors duration-200 ${item.className}`}
             className={`${item.className}`}
             accept={item.type === 'file' ? "image/*" : undefined}
           />

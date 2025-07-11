@@ -22,7 +22,7 @@ const Sidbar = ({ username, type,profilepic }) => {
   }
   };
   const url = `${ServerURL()}${convertPath(profilepic)}`
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   const navigate = useNavigate();
   const token = localStorage.getItem("authToken");
 
@@ -156,7 +156,7 @@ const Sidbar = ({ username, type,profilepic }) => {
                 <div className="p-1 mr-2 ">{a.Icon}</div>
                 <div
                   className={`${show ? "opacity-0" : "opacity-100 mt-2"} h-14`}
-                  onClick={() => navigate(`/dashbord/${a.path}`)}
+                  onClick={() => {navigate(`/dashbord/${a.path}`);setShow(true)}}
                 >
                   {a.name}
                 </div>

@@ -11,9 +11,28 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // Middleware
+const authenticate = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1]; // استخراج توکن از هدر
+console.log(token)
+  if (!token) {
+    return res.status(401).send("Access denied. No token provided.");
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // ذخیره اطلاعات کاربر در درخواست
+    next(); // ادامه اجرای میدلور
+  } catch (error) {
+    console.error('Authentication error:', error);
+    res.status(400).send("Invalid token.");
+  }
+};
+
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
@@ -122,7 +141,7 @@ console.log(password)
     connection.release();
 
     if (results.length === 0) {
-      return res.status(401).send("User not found");
+      return res.status(401).send("User not found Back to Register");
     }
     const user = results[0];
     const match = await bcrypt.compare(password, user.password);

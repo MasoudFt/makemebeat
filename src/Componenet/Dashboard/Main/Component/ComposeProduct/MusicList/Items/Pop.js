@@ -1,268 +1,320 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import ServerURL from "../../../../../../API/ServerURL";
-const Pop = ({Component}) => {
-  const userId = useSelector((state) => state.userId);
-  const d = new Date();
-  const Time=new Intl.DateTimeFormat("fa-IR", {
-    dateStyle: "full",
-    // timeStyle: "short",
-  }).format(d)
-  const ComponentType=Component;
-  const tokenUserId = localStorage.getItem("userId")
-  const [Loading,setLoading]=useState(false);
+import ServerURL from "../../../../../../API/ServerURL"; // مسیر صحیح
 
+const Pop = ({ Component }) => {
+  // استفاده از userId از Redux یا localStorage
+  const userIdFromRedux = useSelector((state) => state.userId);
+  const userIdFromStorage = localStorage.getItem("userId");
+  const tokenUserId = userIdFromRedux || userIdFromStorage;
+
+  const d = new Date();
+  const Time = new Intl.DateTimeFormat("fa-IR", { dateStyle: "full" }).format(d);
+  const ComponentType = Component; // فرض می‌کنیم این property به درستی پاس داده می‌شود
+
+  // State برای مدیریت ورودی‌های فرم
   const [inputValues, setInputValues] = useState({
     user_id: tokenUserId,
-    productName: "", // Changed from title to productName
-    productImage: null,
-    createat: Time,
-    view: "",
-    likeproduct: "",
-    post_id: "",
-    sheroMelody: 0,
-    tanzim: 0,
-    sampleproduct: 0,
-    type:ComponentType[0],
-    gener:"",
-    gammuisc: "",
-    tempo: "",
-    productDescription: "", // Changed from tozihat to productDescription
-    demoMP3File: null,
-    mainMP3File: null,
-    tagMP3File: null,
-    waveFile: null,
-    projectFile: null,
-    coverImage: null,
-    primaryAmount: "",
-    discountAmount: "",
-  });
-  const [formData, setFormData] = useState({
-    message: "",
-    gammuisc: "",
-    tempo: 100,
-    title: "",
-    tozihat: "",
-    sheromelody: 0,
-    tanzim: 0,
-    sampleproduct: 0,
+    productName: "", // عنوان محصول
+    productImage: null, // عکس اصلی محصول
+    createat: Time, // زمان ایجاد
+    // view: "", // این فیلدها معمولاً در سمت سرور مدیریت می‌شوند
+    // likeproduct: "",
+    // post_id: "",
+    type: ComponentType?.[0] || 'general', // نوع کامپوننت یا دسته‌بندی کلی
+    gammuisc: "", // گام موسیقی
+    tempo: "", // تمپو
+    productDescription: "", // توضیحات محصول
+    // فیلدهای مربوط به دسته‌بندی‌های خاص (این‌ها را با دقت مدیریت می‌کنم)
+    demoMP3File: null,       // فایل دمو MP3
+    mainMP3File: null,       // فایل اصلی MP3
+    tagMP3File: null,       // فایل MP3 با تگ
+    waveFile: null,         // فایل WAV
+    projectFile: null,      // فایل پروژه (zip/rar)
+    coverImage: null,       // عکس کاور برای شعر یا محصول
+    primaryAmount: "",      // مبلغ اصلی
+    discountAmount: "",     // مبلغ تخفیف
   });
 
-  const [selectCheckbox, setSelectCheckbox] = useState(null);
-  const [checkboxShowTanzim, setCheckboxShowTanzim] = useState([]);
+  // مدیریت نمایش حالات مختلف برای چک‌باکس‌ها
+  const [showFileFields, setShowFileFields] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
 
+  // تعریف ساختار کلی فیلدها
+  const inputItems = [
+    { label: "عنوان محصول", field: "productName", type: "text", placeholder: "پاپ" },
+    { label: "عکس محصول", field: "productImage", type: "file", accept: "image/*", placeholder: "انتخاب عکس" },
+    { label: "توضیحات محصول", field: "productDescription", type: "textarea", placeholder: "جزئیات محصول را اینجا وارد کنید..." },
+    { label: "گام موسیقی", field: "gammuisc", type: "text", placeholder: "مثال: Cm" },
+    { label: "تمپو (BPM)", field: "tempo", type: "text", placeholder: "مثال: 140" },
+  ];
 
-  const handleSubmit2 = async (e) => {
-    e.preventDefault();
-    setLoading(true)
-    const fd = new FormData();
-    Object.entries(inputValues).forEach(([key, value]) => {
-      if (value !== null && value !== "") {
-        fd.append(key, value);
-      }
-    });
+  // دسته‌بندی‌های اصلی برای انتخاب (مثلاً شعر و ملودی، تنظیم، ...)
+  const productCategoryGroups = [
+    {
+      name: "شعر و ملودی",
+      fields: [
+        { name: "فایل mp3 دمو", field: "demoMP3File", labelInput: "فایل دمو MP3", type: "file", accept: ".mp3", note: "مجاز: mp3 (حداکثر 1000 MB)" },
+        { name: "فایل mp3 اصلی", field: "mainMP3File", labelInput: "فایل اصلی MP3", type: "file", accept: ".mp3", note: "مجاز: mp3 (حداکثر 1000 MB)" },
+        { name: "عکس شعر با آکورد", field: "coverImage", labelInput: "عکس شعر/آکورد", type: "file", accept: "image/*", note: "مجاز: jpg, png (حداکثر 1 MB)" }
+      ],
+    },
+    {
+      name: "تنظیم و میکس",
+      fields: [
+        { name: "mp3 با تگ", field: "tagMP3File", labelInput: "فایل MP3 با تگ", type: "file", accept: ".mp3", note: "مجاز: mp3 (حداکثر 20 MB)" },
+        { name: "فایل WAV", field: "waveFile", labelInput: "فایل WAV", type: "file", accept: ".wav", note: "مجاز: wav (حداکثر 100 MB)" },
+        { name: "پروژه (لاین به لاین)", field: "projectFile", labelInput: "فایل پروژه", type: "file", note: "مجاز: zip, rar (حداکثر 1000 MB)" },
+        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی (تومان)", type: "text", note: "قیمت به تومان" },
+        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف (تومان)", type: "text", note: "قیمت به تومان" },
+      ],
+    },
+    {
+      name: "نمونه کار آماده",
+      fields: [
+        { name: "دمو فایل mp3", field: "demoMP3File", labelInput: "دمو فایل MP3", type: "file", accept: ".mp3", note: "مجاز: mp3 (حداکثر 20 MB)" },
+        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی (تومان)", type: "text", note: "قیمت به تومان" },
+        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف (تومان)", type: "text", note: "قیمت به تومان" },
+        { name: "کاور محصول", field: "coverImage", labelInput: "کاور محصول", type: "file", accept: "image/*", note: "مجاز: jpg, png (حداکثر 1 MB)" },
+      ],
+    },
+  ];
 
-    try {
-      const response = await axios.post(`${ServerURL()}musics`, fd, {
-      // const response = await axios.post(`http://localhost:3000/musics`, fd, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setFormData({ ...formData, message: response.data.message });
-      console.log(response.data);
-      setLoading(false)
-    } catch (error) {
-      console.error("Error uploading music:", error);
-      setFormData({ ...formData, message: "Error uploading music" });
-    }
-  };
+  const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(null); // برای رادیو دکمه‌ها
 
+  // --- مدیریت ورودی‌ها ---
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
-      setInputValues((prev) => ({ ...prev, [name]: checked ? 1 : 0 }));
-    } else {
-      setInputValues((prev) => ({ ...prev, [name]: value }));
-    }
+    setInputValues(prev => ({
+      ...prev,
+      [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
+    }));
   };
 
   const handleFileChange = (e, field) => {
     const file = e.target.files[0] || null;
-    setInputValues((prev) => ({ ...prev, [field]: file }));
+    setInputValues(prev => ({ ...prev, [field]: file }));
   };
 
-  const inputItems = [
-    { label: "عنوان محصول", field: "productName", type: "text" },
-    { label: "عکس محصول", field: "productImage", type: "file", accept: "image/*" },
-    { label: "توضیحات محصول", field: "productDescription", type: "textarea" },
-    { label: "گام", field: "gammuisc", type: "text" },
-    { label: "تمپو", field: "tempo", type: "text" },
-  ];
-
-  const inputCheckBoxItem = [
-    {
-      name: "شعر و ملودی",
-      item: [
-        { name: "فایل mp3 دمو دارد", field: "demoMP3File", labelInput: "فایل دمو mp3", type: "file", accept: ".mp3",note:"انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 1,000 MB." },
-        { name: "فایل mp3 آپلود اصلی", field: "mainMP3File", labelInput: "فایل اصلی mp3", type: "file", accept: ".mp3",note:"انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 1,000 MB." },
-        { name: "آپلود عکس شعر به همراه آکورد ها", field: "coverImage", labelInput: "آپلود عکس شعر به همراه آکورد ها", type: "file", accept: "image/*",note:"انواع فایل های مجاز : jpg, jpeg, png, حداکثر اندازه فایل: 1 MB" }
-      ],
-    },
-    {
-      name: "تنظیم",
-      item: [
-        { name: "mp3 با تگ دارد", field: "tagMP3File", labelInput: "mp3 با تگ", type: "file", accept: ".mp3",note:"انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 20 MB." },
-        { name: "wave دارد", field: "waveFile", labelInput: "wave", type: "file", accept: ".wav",note:"انواع فایل های مجاز : wav, حداکثر اندازه فایل: 100 MB." },
-        { name: "پروژه (لاین به لاین) دارد", field: "projectFile", labelInput: "(لاین به لاین)", type: "file",note:"انواع فایل های مجاز : zip, rar, حداکثر اندازه فایل: 1,000 MB." },
-        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text",note:"قیمت به تومان وارد شود." },
-        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف", type: "text" ,note:"قیمت به تومان وارد شود."},
-      ],
-    },
-    {
-      name: "نمونه کارآماده",
-      item: [
-        { name: "mp3 آپلود دمو فایل", field: "demoMP3File", labelInput: "دمو فایل mp3", type: "file", accept: ".mp3",note:"انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 20 MB." },
-        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text",note:"قیمت به تومان وارد شود." },
-        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف", type: "text",note:"قیمت به تومان وارد شود." },
-        { name: "کاور محصول", field: "coverImage", labelInput: "اپلود کاور", type: "file", accept: "image/*" ,note:"انواع فایل های مجاز : jpg, jpeg, png, حداکثر اندازه فایل: 1 MB."},
-      ],
-    },
-  ];
-
-  const handleCheckboxToggle = (index) => {
-    const newCheckboxState = [...checkboxShowTanzim];
-    newCheckboxState[index] = !newCheckboxState[index];
-    setCheckboxShowTanzim(newCheckboxState);
-  };
-  const handleSelectCheckbox = (index) => {
-    setSelectCheckbox(index);
-
-    // Reset the values in inputValues for the file and text inputs associated with the newly selected checkbox group
-    const items = inputCheckBoxItem[index]?.item || [];
+  // مدیریت انتخاب دسته‌بندی اصلی (رادیو دکمه‌ها)
+  const handleCategorySelect = (index) => {
+    setSelectedCategoryIndex(index);
+    // پاک کردن مقادیر فیلدهای قبلی هنگام تغییر دسته‌بندی
+    const currentCategory = productCategoryGroups[index];
     const resetValues = {};
-    items.forEach(item => {
+    currentCategory.fields.forEach(item => {
       resetValues[item.field] = item.type === 'file' ? null : '';
     });
-
-    // Set the corresponding value to 1 based on the selected index
-    let groupUpdate = {};
-    if (index === 0) {
-      groupUpdate = { sheroMelody: 1, tanzim: 0, sampleproduct: 0 };
-    } else if (index === 1) {
-      groupUpdate = { sheroMelody: 0, tanzim: 1, sampleproduct: 0 };
-    } else if (index === 2) {
-      groupUpdate = { sheroMelody: 0, tanzim: 0, sampleproduct: 1 };
-    }
-
-    setInputValues(prev => ({ ...prev, ...resetValues, ...groupUpdate }));
-    setCheckboxShowTanzim(Array(items.length).fill(false)); // Reset checkboxShowTanzim
+    setInputValues(prev => ({ ...prev, ...resetValues }));
+    setShowFileFields({}); // پاک کردن نمایش فیلدهای فعال قبلی
   };
 
-  const ButtonClassName = "bg-black border border-purple-600 text-white text-base font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline";
+  // مدیریت نمایش فیلدهای زیر چک‌باکس‌ها
+  const handleToggleFieldVisibility = (field) => {
+    setShowFileFields(prev => ({
+      ...prev,
+      [field]: !prev[field] // Toggle current visibility
+    }));
+  };
 
+  // --- ارسال فرم ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setSubmitMessage(""); // پاک کردن پیام قبلی
+
+    const formData = new FormData();
+    // اضافه کردن تمام مقادیر state به formData
+    Object.entries(inputValues).forEach(([key, value]) => {
+      if (value !== null && value !== "" && value !== undefined) {
+        formData.append(key, value);
+      }
+    });
+
+    try {
+      const response = await axios.post(`${ServerURL()}musics`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setSubmitMessage(response.data.message || "عملیات با موفقیت انجام شد.");
+      console.log("ارسال موفق:", response.data);
+      resetForm(); // پاک کردن فرم پس از ارسال موفقیت آمیز
+    } catch (error) {
+      console.error("خطا در ارسال:", error);
+      setSubmitMessage(error.response?.data?.message || "خطا در ارسال اطلاعات.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // تابع برای پاک کردن فرم
+  const resetForm = () => {
+    setInputValues({
+      user_id: tokenUserId,
+      productName: "", productImage: null, createat: Time,
+      type: ComponentType?.[0] || 'general',
+      gammuisc: "", tempo: "", productDescription: "",
+      demoMP3File: null, mainMP3File: null, tagMP3File: null, waveFile: null, projectFile: null, coverImage: null,
+      primaryAmount: "", discountAmount: "",
+    });
+    setSelectedCategoryIndex(null);
+    setShowFileFields({});
+  };
+
+  // --- کلاس‌های استایل و ریسپانسیو ---
+  const baseWrapperClass = "min-h-screen w-full bg-zinc-900 py-6 px-3"; // پس‌زمینه کلی بدون گرادیان
+  const formContainerClass = "flex flex-col max-w-3xl mx-auto p-5 sm:p-8 rounded-xl shadow-lg bg-zinc-900/70 backdrop-blur-md border border-zinc-700/40";
+  const titleClass = "text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 mb-4 sm:mb-6 text-center";
+  const inputGroupClass = "flex flex-col mb-4";
+  const labelClass = "block text-sm font-medium text-gray-300 mb-2";
+  const inputFieldClass = "w-full px-3 py-2 border border-purple-600 rounded-lg bg-zinc-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300";
+  const fileInputClass = `${inputFieldClass} file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-800 file:text-white file:cursor-pointer file:hover:bg-purple-700`;
+  const textareaClass = `${inputFieldClass} h-32 resize-y`;
+  const categoryRadioGroupClass = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6";
+  const categoryLabelClass = "flex items-center cursor-pointer p-3 rounded-lg border border-purple-700/50 hover:bg-zinc-800 transition-all duration-300";
+  const categoryInputClass = "h-5 w-5 text-purple-500 focus:ring-purple-400 mr-3";
+  const categoryNameClass = "text-lg font-semibold text-white";
+  const conditionalFieldsContainerClass = "mt-6 p-5 sm:p-6 border-t border-purple-700/30 bg-zinc-800/50 rounded-lg";
+  const conditionalFieldLabelClass = "block text-md font-semibold text-purple-400 mb-3";
+  const fieldItemWrapperClass = "grid grid-cols-[auto_1fr] items-start gap-x-3 sm:gap-x-4 mb-4";
+  const fieldCheckboxClass = "h-4 w-4 text-purple-500 rounded focus:ring-purple-400 mt-1.5";
+  const fieldLabelClass = "text-gray-300 font-medium";
+  const specificFieldInputContainerClass = "col-span-2 ml-0 sm:ml-9 grid gap-y-2";
+  const noteTextStyle = "text-xs text-blue-400 mt-1";
+  const submitButtonClass = "w-full max-w-xs mx-auto py-3 px-6 bg-black border border-purple-700 text-white text-lg font-bold rounded-lg hover:bg-zinc-900 hover:border-purple-800 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500";
+  const loadingSpinnerContainerClass = "flex items-center justify-center";
+  const loadingSpinnerClass = "animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-purple-400 mr-3";
+  const messageTextStyle = "mt-4 text-center text-sm font-medium";
 
   return (
-    <div dir="rtl" className="bg-zinc-950 text-white p-5 rounded-lg shadow-md shadow-zinc-200">
-    <form onSubmit={handleSubmit2} className="grid gap-2">
-    <h2 className="flex place-content-end text-base mb-4 text-zinc-300"> {Time}</h2>
-        <div>
-          {inputItems.map((item, idx) => (
-            <div key={idx} className="flex flex-col mb-4">
-              <label className="mb-2">{item.label}</label>
-              {item.type === "textarea" ? (
-                <textarea
-                  className="rounded-lg border border-purple-500 bg-transparent text-white p-2"
-                  name={item.field}
-                  value={inputValues[item.field]}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <input
-                  className="rounded-lg border border-purple-500 bg-transparent text-white p-2"
-                  type={item.type}
-                  name={item.field}
-                  accept={item.accept}
-                  onChange={item.type === "file" ? (e) => handleFileChange(e, item.field) : handleInputChange}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+    <div dir="rtl" className={baseWrapperClass}>
+      <div className={formContainerClass}>
+        <h1 className={titleClass}>ثبت محصول جدید</h1>
+        <h2 className="flex justify-end text-sm text-zinc-400 mb-4">{Time}</h2>
 
-        {/* Checkbox groups and their inputs */}
-        <div className="text-white">
-          {/* Checkbox selectors */}
-          <div className="flex justify-between p-1 m-1">
-        {inputCheckBoxItem.map((group, idx) => (
-          <div className="flex items-center mb-2" key={idx}>
-            <input
-              type="radio" // Changed to radio
-              name="checkboxGroup"
-              className="text-purple-600 rounded-full"
-              checked={selectCheckbox === idx}
-              onChange={() => handleSelectCheckbox(idx)} // Changed to handleSelectCheckbox
-            />
-            <label className="ml-2">{group.name}</label>
-          </div>
-        ))}
-      </div>
-
-          {/* Group inputs */}
-          {selectCheckbox !== null && (
-        <div>
-          
-          {inputCheckBoxItem[selectCheckbox]?.item.map((item, idx) => (
-            <div key={idx} className="grid items-start gap-2 p-1 w-full">
-              <input
-                type="checkbox"
-                className="text-purple-600 rounded-full mt-1"
-                checked={checkboxShowTanzim[idx] || false}
-                onChange={() => handleCheckboxToggle(idx)}
-                id={`checkbox-item-${idx}`}
-              />
-              <label htmlFor={`checkbox-item-${idx}`} className="ml-2">
-                {item.name}
-              </label>
-              {checkboxShowTanzim[idx] && (
-                <>
-                <div className="grid gap-2 ml-6 mt-1">
+        <form onSubmit={handleSubmit} className="grid gap-y-4">
+          {/* --- فیلدهای اصلی --- */}
+          <div>
+            {inputItems.map((item) => (
+              <div key={item.field} className={inputGroupClass}>
+                <label htmlFor={item.field} className={labelClass}>{item.label}</label>
+                {item.type === "textarea" ? (
+                  <textarea id={item.field} name={item.field} className={textareaClass} value={inputValues[item.field] || ""} onChange={handleInputChange} placeholder={item.placeholder} />
+                ) : (
                   <input
-                    className="rounded-lg border border-purple-500 bg-gray-800 text-white p-2"
+                    id={item.field}
                     type={item.type}
                     name={item.field}
                     accept={item.accept}
+                    className={item.type === "file" ? fileInputClass : inputFieldClass}
+                    value={item.type === "file" ? "" : inputValues[item.field] || ""} // File inputs cannot have their value set directly
                     onChange={item.type === "file" ? (e) => handleFileChange(e, item.field) : handleInputChange}
+                    placeholder={item.placeholder}
                   />
-                </div>
-                <p className='text-xs font-semibold text-cyan-50'>{item.note}</p>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-          {/* Submit button */}
-          </div>
-          <div className='flex justify-center p-1 mt-5'>
-            <button type="submit" className={ButtonClassName}>
-             {Loading?
-             <div className='flex p-1 gap-4'>
-             <p>در حال بارگذاری اطلاعات</p>   
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500">
+                )}
               </div>
-             </div>
-             :" ارسال اطلاعات"}
+            ))}
+          </div>
+
+          {/* --- دسته‌بندی‌های محصول (رادیو دکمه‌ها) --- */}
+          <div className="mt-4">
+            <p className={`${labelClass} text-lg mb-3`}>انتخاب دسته بندی:</p>
+            <div className={categoryRadioGroupClass}>
+              {productCategoryGroups.map((category, index) => (
+                <label key={index} className={categoryLabelClass} htmlFor={`category-${index}`}>
+                  <input
+                    type="radio"
+                    id={`category-${index}`}
+                    name="productCategory"
+                    className={categoryInputClass}
+                    checked={selectedCategoryIndex === index}
+                    onChange={() => handleCategorySelect(index)}
+                  />
+                  <span className={categoryNameClass}>{category.name}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* --- فیلدهای شرطی بر اساس دسته بندی انتخاب شده --- */}
+            {selectedCategoryIndex !== null && (
+              <div className={conditionalFieldsContainerClass}>
+                <h3 className={conditionalFieldLabelClass}>{productCategoryGroups[selectedCategoryIndex].name}</h3>
+                <div>
+                  {productCategoryGroups[selectedCategoryIndex].fields.map((field, fieldIndex) => (
+                    <div key={fieldIndex} className={fieldItemWrapperClass}>
+                      <input
+                        type="checkbox"
+                        id={`${field.field}-checkbox-${fieldIndex}`}
+                        className={fieldCheckboxClass}
+                        checked={showFileFields[field.field] || false}
+                        onChange={() => handleToggleFieldVisibility(field.field)}
+                      />
+                      <label htmlFor={`${field.field}-checkbox-${fieldIndex}`} className={fieldLabelClass}>{field.name}</label>
+
+                      {showFileFields[field.field] && (
+                        <div className={specificFieldInputContainerClass}>
+                          {field.type === 'file' ? (
+                            <>
+                              <label htmlFor={`${field.field}-file`} className={labelClass}>{field.labelInput}</label>
+                              <input
+                                id={`${field.field}-file`}
+                                type="file"
+                                accept={field.accept}
+                                name={field.field}
+                                className={fileInputClass}
+                                onChange={(e) => handleFileChange(e, field.field)}
+                              />
+                              {field.note && <p className={noteTextStyle}>{field.note}</p>}
+                            </>
+                          ) : (
+                            <>
+                              <label htmlFor={field.field} className={labelClass}>{field.labelInput}</label>
+                              <input
+                                id={field.field}
+                                type={field.type}
+                                name={field.field}
+                                className={inputFieldClass}
+                                value={inputValues[field.field] || ""}
+                                onChange={handleInputChange}
+                                placeholder={field.labelInput}
+                              />
+                              {field.note && <p className={noteTextStyle}>{field.note}</p>}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* --- دکمه ارسال --- */}
+          <div className="mt-6 flex justify-center">
+            <button type="submit" className={submitButtonClass} disabled={loading}>
+              {loading ? (
+                <div className={loadingSpinnerContainerClass}>
+                  <div className={loadingSpinnerClass}></div>
+                  <p>در حال ارسال...</p>
+                </div>
+              ) : (
+                "ارسال اطلاعات"
+              )}
             </button>
-        </div>
-            {formData.message && (
-              <p className="text-white mt-3">{formData.message}</p>
+          </div>
+
+          {/* --- نمایش پیام وضعیت --- */}
+          {submitMessage && (
+            <p className={`${messageTextStyle} ${submitMessage.toLowerCase().includes("error") ? "text-red-400" : "text-green-400"}`}>
+              {submitMessage}
+            </p>
           )}
-      </form>
+        </form>
+      </div>
     </div>
   );
-}
+};
 
 export default Pop;

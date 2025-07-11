@@ -83,22 +83,7 @@ export const postUrlMuiscFile=(state=[],action)=>{
          return state;
     }
 }
-// export const postProductlist = (state = { cart: [], alert: null }, action) => {
 
-//     switch (action.type) {
-//       case "postProductlist":  
-//       const updatedCartAdd = [...state.cart, action.payload];
-//       localStorage.setItem('cart', JSON.stringify(updatedCartAdd));
-//       return { ...state, cart: updatedCartAdd, alert: null };
-//       case "Alret":  
-//         return { ...state, alert: action.payload };
-//       case "UPDATE_CART":  // اکشن جدید برای به‌روزرسانی سبد خرید
-//       localStorage.setItem('cart', JSON.stringify(action.payload));
-//       return { ...state, cart: action.payload };
-//       default:
-//         return state;
-//     }
-//   };
 export const postProductlist = (state = { cart: [], alert: null }, action) => {
     switch (action.type) {
       case "postProductlist":

@@ -58,7 +58,7 @@ const Wishlist = ({ items }) => {
         <div className="bg-gray-800/20 border border-dashed border-gray-700 rounded-lg p-8 text-center">
           <FiHeart className="mx-auto text-gray-600 mb-3" size={48} />
           <div className="text-gray-400 mb-1"> لیست مشتری های برتر شما خالی است</div>
-          <div className="text-sm text-gray-600600">مشتری هایی که به آنها علاقه دارید را اینجا ذخیره کنید</div>
+          <div className="text-sm text-gray-600">مشتری هایی که به آنها علاقه دارید را اینجا ذخیره کنید</div>
           <button className="mt-4 text-purple-400 hover:text-purple-300 text-sm flex items-center justify-center gap-1 mx-auto">
            مشاهده مشتری ها
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

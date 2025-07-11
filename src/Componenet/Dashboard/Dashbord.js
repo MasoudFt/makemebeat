@@ -11,6 +11,7 @@ import ServerURL from "../API/ServerURL";
 const Dashbord = () => {
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem("authToken");
   const tokenUserId = localStorage.getItem("userId");
@@ -24,19 +25,28 @@ const Dashbord = () => {
       navigate("/login");
       return;
     }
+    if(error){
+      setInterval(() => {
+        navigate("/SignUp");
+      }, 5000);
+
+    }
     const adminStatus = localStorage.getItem("isAdmin");
     setIsAdmin(adminStatus === "true");
     const getData = async () => {
       try {
-        const response = await axios.get(`${ServerURL()}users/${tokenUserId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-          },
+        // const response = await axios.get(`${ServerURL()}users/${tokenUserId}`, {
+        const response = await axios.get(`http://localhost:3001/users/${tokenUserId}`, {
+          // headers: {
+          //   Authorization: `Bearer ${token}`, 
+          // },
         });
         setUserInfo(response.data);
         setLoading(false);
       } catch (error) {
         console.error("Error:", error.response ? error.response.data : error.message);
+        setError( error.response ? error.response.data : error.message)
+        // console.log(error)
       }
     };
     getData();
@@ -44,9 +54,13 @@ const Dashbord = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      <div className="flex flex-col justify-center items-center h-screen ">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
+      <p className="text-cyan-50 font-bold text-xl max-w-md text-center px-4">
+        {error || 'در حال بارگذاری...'}
+      </p>
+    </div>
+    
     );
   }
 
@@ -55,28 +69,35 @@ const Dashbord = () => {
       {isAdmin ? (
         <AdminDashbord />
       ) : (
-        <div dir="rtl" className="grid grid-flow-row-dense grid-cols-5 p-1 gap-10 ">
-          <div className="col-span-1">
-            <Sidebar
-              profilepic={userInfo?.profile_path}
-              username={userInfo?.username}
-              type={userInfo?.seller === 0}
-            />
-          </div>
-          <div className="col-span-4 mt-14 mb-5">
-            <div className="grid md:grid-cols-2 sm:grid-cols-1 flow-row">
-              <div>
-                <Head type={userInfo?.seller === 0} />
-              </div>
-              <div>
-                <Head type={userInfo?.seller === 0} />
-              </div>
-            </div>
-            <div className="border-t-2 border-purple-600 rounded-lg mt-5 h-screen">
-              <Main />
-            </div>
-          </div>
-        </div>
+        <div dir="rtl" className="grid grid-cols-1 md:grid-cols-5 p-2 gap-8 md:gap-10">
+  {/* Sidebar - در موبایل کل عرض را می‌گیرد و در دسکتاپ 1/5 */}
+  <div className="col-span-1">
+    <Sidebar
+      profilepic={userInfo?.profile_path}
+      username={userInfo?.username}
+      type={userInfo?.seller === 0}
+    />
+  </div>
+
+  {/* محتوای اصلی - در موبایل کل عرض و در دسکتاپ 4/5 */}
+  <div className="col-span-4 mt-4 md:mt-14 mb-5 min-h-screen">
+    {/* هدر با دو ستون در دسکتاپ و یک ستون در موبایل */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      <div>
+        <Head type={userInfo?.seller === 0} />
+      </div>
+      <div>
+        <Head type={userInfo?.seller === 0} />
+      </div>
+    </div>
+
+    {/* بخش اصلی محتوا */}
+    <div className="border-t-2 border-purple-600 rounded-lg mt-6 md:mt-10 p-2">
+      <Main />
+    </div>
+  </div>
+</div>
+
       )}
     </>
   );

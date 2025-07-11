@@ -23,14 +23,14 @@ const SideBarItem=[
   
 ]
   return (
-    <div className='grid mt-10 '>
+    
    
     <Routes>
       {SideBarItem.map((item) => (
         <Route key={item.title} path={item.path} element={item.Component} />
       ))}
     </Routes>
-  </div>
+ 
   )
 }
 

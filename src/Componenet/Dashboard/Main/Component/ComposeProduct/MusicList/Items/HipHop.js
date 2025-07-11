@@ -1,539 +1,285 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import axios from "axios";
+import { useSelector } from 'react-redux';
+import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import ServerURL from "../../../../../../API/ServerURL";
 
 const HipHop = ({ Component }) => {
-  const userId = useSelector((state) => state.userId);
+  const userIdFromRedux = useSelector((state) => state.userId);
+  const userIdFromStorage = localStorage.getItem("userId");
+  const tokenUserId = userIdFromRedux || userIdFromStorage;
   const navigate = useNavigate();
+
   const d = new Date();
-  const Time = new Intl.DateTimeFormat("fa-IR", {
-    dateStyle: "full",
-    // timeStyle: "short",
-  }).format(d);
+  const Time = new Intl.DateTimeFormat("fa-IR", { dateStyle: "full" }).format(d);
   const ComponentType = Component;
 
-  const [selectCheckbox, setSelectCheckbox] = useState(0);
-  const [checkboxShowTanzim, setCheckboxShowTanzim] = useState([]);
+  const selectGener = ["رپ", "ترپ", "دریل", "آراندبی", "اولد اسکول", "دیگر ..."];
 
-  const [Loading, setLoading] = useState(false);
-  const selectGener = [
-    "رپ",
-    "ترپ",
-    "دریل",
-    "آراندبی",
-    "اولد اسکول",
-    "دیگر ...",
-  ];
-  const inputCheckBoxItem = [
-    {
-      name: "رپ",
-      item: [
-        {
-          name: "mp3 با تگ دارد.",
-          field: "mainMP3File",
-          labelInput: "mp3 با تگ .",
-          type: "file",
-          accept: ".mp3",
-        },
-        {
-          name: "wave  دارد.",
-          field: "waveFile",
-          labelInput: "wave .",
-          type: "file",
-          accept: ".wav",
-        },
-        {
-          name: "پروژه (لاین به لاین) دارد.",
-          field: "projectFile",
-          labelInput: "(لاین به لاین)",
-          type: "file",
-        },
-        {
-          name: "مبلغ اصلی",
-          field: "primaryAmount",
-          labelInput: "مبلغ اصلی",
-          type: "text",
-        },
-        {
-          name: "مبلغ تخفیف",
-          field: "discountAmount",
-          labelInput: "مبلغ تخفیف",
-          type: "text",
-        },
-      ],
-    },
-    {
-      name: "ترپ",
-      item: [
-        {
-          name: "mp3 با تگ دارد.",
-          field: "mainMP3File",
-          labelInput: "mp3 با تگ .",
-          type: "file",
-          accept: ".mp3",
-        },
-        {
-          name: "wave  دارد.",
-          field: "waveFile",
-          labelInput: "wave .",
-          type: "file",
-          accept: ".wav",
-        },
-        {
-          name: "پروژه (لاین به لاین) دارد.",
-          field: "projectFile",
-          labelInput: "(لاین به لاین)",
-          type: "file",
-        },
-        {
-          name: "مبلغ اصلی",
-          field: "primaryAmount",
-          labelInput: "مبلغ اصلی",
-          type: "text",
-        },
-        {
-          name: "مبلغ تخفیف",
-          field: "discountAmount",
-          labelInput: "مبلغ تخفیف",
-          type: "text",
-        },
-      ],
-    },
-    {
-      name: "دریل",
-      item: [
-        {
-          name: "mp3 با تگ دارد.",
-          field: "mainMP3File",
-          labelInput: "mp3 با تگ .",
-          type: "file",
-          accept: ".mp3",
-        },
-        {
-          name: "wave  دارد.",
-          field: "waveFile",
-          labelInput: "wave .",
-          type: "file",
-          accept: ".wav",
-        },
-        {
-          name: "پروژه (لاین به لاین) دارد.",
-          field: "projectFile",
-          labelInput: "(لاین به لاین)",
-          type: "file",
-        },
-        {
-          name: "مبلغ اصلی",
-          field: "primaryAmount",
-          labelInput: "مبلغ اصلی",
-          type: "text",
-        },
-        {
-          name: "مبلغ تخفیف",
-          field: "discountAmount",
-          labelInput: "مبلغ تخفیف",
-          type: "text",
-        },
-      ],
-    },
-    {
-      name: "آراندبی",
-      item: [
-        {
-          name: "mp3 با تگ دارد.",
-          field: "mainMP3File",
-          labelInput: "mp3 با تگ .",
-          type: "file",
-          accept: ".mp3",
-        },
-        {
-          name: "wave  دارد.",
-          field: "waveFile",
-          labelInput: "wave .",
-          type: "file",
-          accept: ".wav",
-        },
-        {
-          name: "پروژه (لاین به لاین) دارد.",
-          field: "projectFile",
-          labelInput: "(لاین به لاین)",
-          type: "file",
-        },
-        {
-          name: "مبلغ اصلی",
-          field: "primaryAmount",
-          labelInput: "مبلغ اصلی",
-          type: "text",
-        },
-        {
-          name: "مبلغ تخفیف",
-          field: "discountAmount",
-          labelInput: "مبلغ تخفیف",
-          type: "text",
-        },
-      ],
-    },
-    {
-      name: "اولد اسکول",
-      item: [
-        {
-          name: "mp3 با تگ دارد.",
-          field: "mainMP3File",
-          labelInput: "mp3 با تگ .",
-          type: "file",
-          accept: ".mp3",
-        },
-        {
-          name: "wave  دارد.",
-          field: "waveFile",
-          labelInput: "wave .",
-          type: "file",
-          accept: ".wav",
-        },
-        {
-          name: "پروژه (لاین به لاین) دارد.",
-          field: "projectFile",
-          labelInput: "(لاین به لاین)",
-          type: "file",
-        },
-        {
-          name: "مبلغ اصلی",
-          field: "primaryAmount",
-          labelInput: "مبلغ اصلی",
-          type: "text",
-        },
-        {
-          name: "مبلغ تخفیف",
-          field: "discountAmount",
-          labelInput: "مبلغ تخفیف",
-          type: "text",
-        },
-      ],
-    },
-    {
-      name: "دیگر ...",
-      item: [
-        {
-          name: "mp3 با تگ دارد.",
-          field: "mainMP3File",
-          labelInput: "mp3 با تگ .",
-          type: "file",
-          accept: ".mp3",
-        },
-        {
-          name: "wave  دارد.",
-          field: "waveFile",
-          labelInput: "wave .",
-          type: "file",
-          accept: ".wav",
-        },
-        {
-          name: "پروژه (لاین به لاین) دارد.",
-          field: "projectFile",
-          labelInput: "(لاین به لاین)",
-          type: "file",
-        },
-        {
-          name: "مبلغ اصلی",
-          field: "primaryAmount",
-          labelInput: "مبلغ اصلی",
-          type: "text",
-        },
-        {
-          name: "مبلغ تخفیف",
-          field: "discountAmount",
-          labelInput: "مبلغ تخفیف",
-          type: "text",
-        },
-      ],
-    },
-  ];
-  const tokenUserId = localStorage.getItem("userId");
   const [inputValues, setInputValues] = useState({
     user_id: tokenUserId,
-    productName: "", // Changed from title to productName
-    productImage: null,
-    createat: Time,
-    view: "",
-    likeproduct: "",
-    post_id: "",
-    sheroMelody: 0,
-    tanzim: 0,
-    sampleproduct: 0,
-    type: ComponentType[0],
-    gener: selectGener[selectCheckbox],
-    gammuisc: "",
-    tempo: "",
-    productDescription: "", // Changed from tozihat to productDescription
-    demoMP3File: null,
-    mainMP3File: null,
-    tagMP3: null,
-    waveFile: null,
-    projectFile: null,
-    coverImage: null,
-    primaryAmount: "",
-    discountAmount: "",
-    otherStyle: "", // برای ذخیره سبک دیگر
-  });
-  console.log(inputValues);
-  const [formData, setFormData] = useState({
-    message: "",
-    gammuisc: "",
-    tempo: 100,
-    title: "",
-    tozihat: "",
-    sheromelody: 0,
-    tanzim: 0,
-    sampleproduct: 0,
+    productName: "", productImage: null, createat: Time,
+    type: ComponentType?.[0] || 'hiphop',
+    gener: selectGener[0], // پیش‌فرض رپ
+    gammuisc: "", tempo: "", productDescription: "",
+    demoMP3File: null, mainMP3File: null, tagMP3: null, waveFile: null, projectFile: null, coverImage: null,
+    primaryAmount: "", discountAmount: "",
+    otherStyle: "", // این فیلد را برای استفاده از "دیگر ..." نگه می‌دارم
   });
 
-  const handleSubmit2 = async (e) => {
+  const [showFileFields, setShowFileFields] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+  const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0); // پیش‌فرض انتخاب رپ
+
+  const productCategoryGroups = [
+    { name: "رپ", fields: [
+        { name: "mp3 با تگ دارد.", field: "mainMP3File", labelInput: "mp3 با تگ .", type: "file", accept: ".mp3", note: "انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 1000 MB." },
+        { name: "wave دارد.", field: "waveFile", labelInput: "wave .", type: "file", accept: ".wav", note: "انواع فایل های مجاز : wav, حداکثر اندازه فایل: 100 MB." },
+        { name: "پروژه (لاین به لاین) دارد.", field: "projectFile", labelInput: "(لاین به لاین)", type: "file", note: "انواع فایل های مجاز : zip, rar, حداکثر اندازه فایل: 1000 MB." },
+        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text", note: "قیمت به تومان وارد شود." },
+        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف", type: "text", note: "قیمت به تومان وارد شود." },
+      ],
+    },
+    { name: "ترپ", fields: [
+        { name: "mp3 با تگ دارد.", field: "mainMP3File", labelInput: "mp3 با تگ .", type: "file", accept: ".mp3", note: "انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 1000 MB." },
+        { name: "wave دارد.", field: "waveFile", labelInput: "wave .", type: "file", accept: ".wav", note: "انواع فایل های مجاز : wav, حداکثر اندازه فایل: 100 MB." },
+        { name: "پروژه (لاین به لاین) دارد.", field: "projectFile", labelInput: "(لاین به لاین)", type: "file", note: "انواع فایل های مجاز : zip, rar, حداکثر اندازه فایل: 1000 MB." },
+        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text", note: "قیمت به تومان وارد شود." },
+        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف", type: "text", note: "قیمت به تومان وارد شود." },
+      ],
+    },
+    { name: "دریل", fields: [
+        { name: "mp3 با تگ دارد.", field: "mainMP3File", labelInput: "mp3 با تگ .", type: "file", accept: ".mp3", note: "انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 1000 MB." },
+        { name: "wave دارد.", field: "waveFile", labelInput: "wave .", type: "file", accept: ".wav", note: "انواع فایل های مجاز : wav, حداکثر اندازه فایل: 100 MB." },
+        { name: "پروژه (لاین به لاین) دارد.", field: "projectFile", labelInput: "(لاین به لاین)", type: "file", note: "انواع فایل های مجاز : zip, rar, حداکثر اندازه فایل: 1000 MB." },
+        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text", note: "قیمت به تومان وارد شود." },
+        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف", type: "text", note: "قیمت به تومان وارد شود." },
+      ],
+    },
+    { name: "آراندبی", fields: [
+        { name: "mp3 با تگ دارد.", field: "mainMP3File", labelInput: "mp3 با تگ .", type: "file", accept: ".mp3", note: "انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 1000 MB." },
+        { name: "wave دارد.", field: "waveFile", labelInput: "wave .", type: "file", accept: ".wav", note: "انواع فایل های مجاز : wav, حداکثر اندازه فایل: 100 MB." },
+        { name: "پروژه (لاین به لاین) دارد.", field: "projectFile", labelInput: "(لاین به لاین)", type: "file", note: "انواع فایل های مجاز : zip, rar, حداکثر اندازه فایل: 1000 MB." },
+        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text", note: "قیمت به تومان وارد شود." },
+        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف", type: "text", note: "قیمت به تومان وارد شود." },
+      ],
+    },
+    { name: "اولد اسکول", fields: [
+        { name: "mp3 با تگ دارد.", field: "mainMP3File", labelInput: "mp3 با تگ .", type: "file", accept: ".mp3", note: "انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 1000 MB." },
+        { name: "wave دارد.", field: "waveFile", labelInput: "wave .", type: "file", accept: ".wav", note: "انواع فایل های مجاز : wav, حداکثر اندازه فایل: 100 MB." },
+        { name: "پروژه (لاین به لاین) دارد.", field: "projectFile", labelInput: "(لاین به لاین)", type: "file", note: "انواع فایل های مجاز : zip, rar, حداکثر اندازه فایل: 1000 MB." },
+        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text", note: "قیمت به تومان وارد شود." },
+        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف", type: "text", note: "قیمت به تومان وارد شود." },
+      ],
+    },
+    { name: "دیگر ...", fields: [
+        { name: "فیلد مخصوص دیگر", field: "otherStyle", labelInput: "سبک دیگر", type: "text", note: "" }, // فیلد اختصاصی برای "دیگر ..."
+        { name: "mp3 با تگ دارد.", field: "mainMP3File", labelInput: "mp3 با تگ .", type: "file", accept: ".mp3", note: "انواع فایل های مجاز : mp3, حداکثر اندازه فایل: 1000 MB." },
+        { name: "wave دارد.", field: "waveFile", labelInput: "wave .", type: "file", accept: ".wav", note: "انواع فایل های مجاز : wav, حداکثر اندازه فایل: 100 MB." },
+        { name: "پروژه (لاین به لاین) دارد.", field: "projectFile", labelInput: "(لاین به لاین)", type: "file", note: "انواع فایل های مجاز : zip, rar, حداکثر اندازه فایل: 1000 MB." },
+        { name: "مبلغ اصلی", field: "primaryAmount", labelInput: "مبلغ اصلی", type: "text", note: "قیمت به تومان وارد شود." },
+        { name: "مبلغ تخفیف", field: "discountAmount", labelInput: "مبلغ تخفیف", type: "text", note: "قیمت به تومان وارد شود." },
+      ],
+    },
+  ];
+
+  const inputItems = [
+    { label: "عنوان محصول", field: "productName", type: "text", placeholder: "هیپ هاپ" },
+    { label: "عکس محصول", field: "productImage", type: "file", accept: "image/*", placeholder: "انتخاب عکس" },
+    { label: "توضیحات محصول", field: "productDescription", type: "textarea", placeholder: "جزئیات محصول را اینجا وارد کنید..." },
+    { label: "گام موسیقی", field: "gammuisc", type: "text", placeholder: "مثال: Cm" },
+    { label: "تمپو (BPM)", field: "tempo", type: "text", placeholder: "مثال: 140" },
+  ];
+
+  // توابع مدیریت ورودی و فایل
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setInputValues((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
+    }));
+  };
+  const handleFileChange = (e, field) => {
+    const file = e.target.files[0] || null;
+    setInputValues((prev) => ({ ...prev, [field]: file }));
+  };
+  const handleCategorySelect = (index) => {
+    setSelectedCategoryIndex(index);
+    const currentCategory = productCategoryGroups[index];
+    const resetValues = {};
+    currentCategory.fields.forEach(item => {
+      resetValues[item.field] = item.type === 'file' ? null : '';
+    });
+    // تنظیم مقدار 'gener' بر اساس سبک انتخاب شده
+    setInputValues(prev => ({ ...prev, ...resetValues, gener: selectGener[index] }));
+    setShowFileFields({}); // پاک کردن نمایش فیلدهای فعال قبلی
+  };
+  const handleToggleFieldVisibility = (field) => {
+    setShowFileFields((prev) => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  // ارسال فرم
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setSubmitMessage("");
 
-    const fd = new FormData();
-    // Append inputValues keys (including files)
+    const formData = new FormData();
     Object.entries(inputValues).forEach(([key, value]) => {
-      if (value !== null && value !== "") {
-        fd.append(key, value);
+      if (value !== null && value !== "" && value !== undefined) {
+        formData.append(key, value);
       }
     });
 
     try {
-      const response = await axios.post(`${ServerURL()}musics`, fd, {
-      // const response = await axios.post(`http://localhost:3000/musics`, fd, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const response = await axios.post(`${ServerURL()}musics`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      setFormData({ ...formData, message: response.data.message });
-      console.log(response.data);
-      setLoading(true);
-      // Reset input values to their initial state
-      setInputValues({
-        user_id: userId.userId,
-        productName: "",
-        productImage: null,
-        createat: Time,
-        view: "",
-        likeproduct: "",
-        post_id: "",
-        sheroMelody: 0,
-        tanzim: 0,
-        sampleproduct: 0,
-        type: ComponentType[0],
-        gener: selectCheckbox,
-        gammuisc: "",
-        tempo: "",
-        productDescription: "",
-        demoMP3File: null,
-        mainMP3File: null,
-        tagMP3: null,
-        waveFile: null,
-        projectFile: null,
-        coverImage: null,
-        primaryAmount: "",
-        discountAmount: "",
-        otherStyle: "",
-      });
-
-      // Redirect to another page after 5 seconds
-      setTimeout(() => {
-        // Replace with your desired route
-        navigate("/dashbord/MyProductList");
-      }, 5000);
-
-     
+      setSubmitMessage(response.data.message || "عملیات با موفقیت انجام شد.");
+      resetForm();
+      //setTimeout(() => navigate("/dashbord/MyProductList"), 3000); // مثال: انتقال پس از 3 ثانیه
     } catch (error) {
-      console.error("Error uploading music:", error);
-      setFormData({ ...formData, message: "Error uploading music" });
+      console.error("خطا در ارسال:", error);
+      setSubmitMessage(error.response?.data?.message || "خطا در ارسال اطلاعات.");
     } finally {
       setLoading(false);
     }
   };
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    if (type === "checkbox") {
-      setInputValues((prev) => ({ ...prev, [name]: checked ? 1 : 0 }));
-    } else {
-      setInputValues((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-  const inputItems = [
-    { label: "عنوان محصول", field: "productName", type: "text" },
-    {
-      label: "عکس محصول",
-      field: "productImage",
-      type: "file",
-      accept: "image/*",
-    },
-    { label: "توضیحات محصول", field: "productDescription", type: "textarea" },
-    { label: "گام", field: "gammuisc", type: "text" },
-    { label: "تمپو", field: "tempo", type: "text" },
-  ];
-
-  const handleFileChange = (e, field) => {
-    setInputValues({ ...inputValues, [field]: e.target.files[0] });
-  };
-  const handleCheckboxToggle = (index) => {
-    const updatedCheckboxes = checkboxShowTanzim.map((item, i) =>
-      i === index ? !item : item
-    );
-    setCheckboxShowTanzim(updatedCheckboxes);
-  };
-  const handleSelectCheckbox = (index) => {
-    setSelectCheckbox(index);
-
-    // Reset the values in inputValues for the file and text inputs associated with the newly selected checkbox group
-    const items = inputCheckBoxItem[index]?.item || [];
-    const resetValues = {};
-    items.forEach((item) => {
-      resetValues[item.field] = item.type === "file" ? null : "";
+  // بازنشانی فرم
+  const resetForm = () => {
+    setInputValues({
+      user_id: tokenUserId, productName: "", productImage: null, createat: Time,
+      type: ComponentType?.[0] || 'hiphop', gener: selectGener[selectedCategoryIndex] || selectGener[0],
+      gammuisc: "", tempo: "", productDescription: "",
+      demoMP3File: null, mainMP3File: null, tagMP3: null, waveFile: null, projectFile: null, coverImage: null,
+      primaryAmount: "", discountAmount: "", otherStyle: "",
     });
-
-    // Set the corresponding value to 1 based on the selected index
-    let groupUpdate = {};
-    if (index === 0) {
-      groupUpdate = { sheroMelody: 1, tanzim: 0, sampleproduct: 0 };
-    } else if (index === 1) {
-      groupUpdate = { sheroMelody: 0, tanzim: 1, sampleproduct: 0 };
-    } else if (index === 2) {
-      groupUpdate = { sheroMelody: 0, tanzim: 0, sampleproduct: 1 };
-    }
-
-    // Update the gener value based on selected checkbox (0 corresponds to "رپ")
-    const selectedGener = selectGener[index]; // Get the corresponding genre
-    setInputValues((prev) => ({
-      ...prev,
-      ...resetValues,
-      ...groupUpdate,
-      gener: selectedGener, // Set gener dynamically
-    }));
-
-    setCheckboxShowTanzim(Array(items.length).fill(false)); // Reset checkboxShowTanzim
+    setSelectedCategoryIndex(0);
+    setShowFileFields({});
   };
-  const ButtonClassName =
-    "bg-black border border-purple-600 text-white text-base font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline";
+
+  // کلاس‌های CSS ریسپانسیو
+  const baseWrapperClass = "min-h-screen w-full bg-zinc-900 py-6 px-3";
+  const formContainerClass = "flex flex-col max-w-3xl mx-auto p-5 sm:p-8 rounded-xl shadow-lg bg-zinc-900/70 backdrop-blur-md border border-zinc-700/40";
+  const titleClass = "text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 mb-4 sm:mb-6 text-center";
+  const inputGroupClass = "flex flex-col mb-4";
+  const labelClass = "block text-sm font-medium text-gray-300 mb-2";
+  const inputFieldClass = "w-full px-3 py-2 border border-purple-600 rounded-lg bg-zinc-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300";
+  const fileInputClass = `${inputFieldClass} file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-800 file:text-white file:cursor-pointer file:hover:bg-purple-700`;
+  const textareaClass = `${inputFieldClass} h-32 resize-y`;
+  const categoryRadioGroupClass = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6";
+  const categoryLabelClass = "flex items-center cursor-pointer p-3 rounded-lg border border-purple-700/50 hover:bg-zinc-800 transition-all duration-300";
+  const categoryInputClass = "h-5 w-5 text-purple-500 focus:ring-purple-400 mr-3";
+  const categoryNameClass = "text-lg font-semibold text-white";
+  const conditionalFieldsContainerClass = "mt-6 p-5 sm:p-6 border-t border-purple-700/30 bg-zinc-800/50 rounded-lg";
+  const conditionalFieldLabelClass = "block text-md font-semibold text-purple-400 mb-3";
+  const fieldItemWrapperClass = "grid grid-cols-[auto_1fr] items-start gap-x-3 sm:gap-x-4 mb-4";
+  const fieldCheckboxClass = "h-4 w-4 text-purple-500 rounded focus:ring-purple-400 mt-1.5";
+  const fieldLabelClass = "text-gray-300 font-medium";
+  const specificFieldInputContainerClass = "col-span-2 ml-0 sm:ml-9 grid gap-y-2";
+  const noteTextStyle = "text-xs text-blue-400 mt-1";
+  const submitButtonClass = "w-full max-w-xs mx-auto py-3 px-6 bg-black border border-purple-700 text-white text-lg font-bold rounded-lg hover:bg-zinc-900 hover:border-purple-800 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500";
+  const loadingSpinnerContainerClass = "flex items-center justify-center";
+  const loadingSpinnerClass = "animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-purple-400 mr-3";
+  const messageTextStyle = "mt-4 text-center text-sm font-medium";
+
   return (
-    <>
-      <div
-        dir="rtl"
-        className="bg-zinc-950 text-white p-5 rounded-lg shadow-md shadow-zinc-200"
-      >
-        <form onSubmit={handleSubmit2} className="grid gap-2">
-          <h2 className="flex place-content-end text-base mb-4 text-zinc-300">
-            {" "}
-            {Time}
-          </h2>
-          {/* Input fields */}
+    <div dir="rtl" className={baseWrapperClass}>
+      <div className={formContainerClass}>
+        <h1 className={titleClass}>ثبت محصول {selectGener[selectedCategoryIndex] || "HipHop"}</h1>
+        <h2 className="flex justify-end text-sm text-zinc-400 mb-4">{Time}</h2>
+        <form onSubmit={handleSubmit} className="grid gap-y-4">
+          {/* فیلدهای اصلی */}
           <div>
-            {inputItems.map((a, b) => (
-              <div key={b} className="flex flex-col mb-4">
-                <label className="mb-2">{a.label}</label>
-                {a.type === "textarea" ? (
-                  <textarea
-                    className="rounded-lg border border-purple-500 bg-transparent text-white p-2"
-                    name={a.field}
-                    value={inputValues[a.field]}
-                    onChange={handleInputChange}
-                  />
+            {inputItems.map((item) => (
+              <div key={item.field} className={inputGroupClass}>
+                <label htmlFor={item.field} className={labelClass}>{item.label}</label>
+                {item.type === "textarea" ? (
+                  <textarea id={item.field} name={item.field} className={textareaClass} value={inputValues[item.field] || ""} onChange={handleInputChange} placeholder={item.placeholder} />
                 ) : (
                   <input
-                    className="rounded-lg border border-purple-500 bg-transparent text-white p-2"
-                    type={a.type}
-                    name={a.field}
-                    accept={a.accept} // Use the `accept` property here
-                    onChange={
-                      a.type === "file"
-                        ? (e) => handleFileChange(e, a.field)
-                        : handleInputChange
-                    }
+                    id={item.field}
+                    type={item.type}
+                    name={item.field}
+                    accept={item.accept}
+                    className={item.type === "file" ? fileInputClass : inputFieldClass}
+                    value={item.type === "file" ? "" : inputValues[item.field] || ""}
+                    onChange={item.type === "file" ? (e) => handleFileChange(e, item.field) : handleInputChange}
+                    placeholder={item.placeholder}
                   />
                 )}
               </div>
             ))}
           </div>
-
-          {/* Checkboxes section */}
-          <div className="text-white">
-            <div className="flex justify-between p-1 m-1">
-              {inputCheckBoxItem.map((group, idx) => (
-                <div className="flex items-center mb-2" key={idx}>
-                  <input
-                    type="radio" // Changed to radio
-                    name="checkboxGroup"
-                    className="text-purple-600 rounded-full"
-                    checked={selectCheckbox === idx}
-                    onChange={() => handleSelectCheckbox(idx)} // Changed to handleSelectCheckbox
-                  />
-                  <label className="ml-2">{group.name}</label>
-                </div>
+          {/* دسته بندی ها */}
+          <div className="mt-4">
+            <p className={`${labelClass} text-lg mb-3`}>سبک موسیقی:</p>
+            <div className={categoryRadioGroupClass}>
+              {selectGener.map((genre, index) => (
+                <label key={index} className={categoryLabelClass} htmlFor={`category-${index}`}>
+                  <input type="radio" id={`category-${index}`} name="productCategory" className={categoryInputClass} checked={selectedCategoryIndex === index} onChange={() => handleCategorySelect(index)} />
+                  <span className={categoryNameClass}>{genre}</span>
+                </label>
               ))}
             </div>
-
-            {selectCheckbox !== null && (
-              <div>
-                {inputCheckBoxItem[selectCheckbox]?.item.map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-2 p-1 w-full">
-                    <input
-                      type="checkbox"
-                      className="text-purple-600 rounded-full mt-1"
-                      checked={checkboxShowTanzim[idx] || false}
-                      onChange={() => handleCheckboxToggle(idx)}
-                      id={`checkbox-item-${idx}`}
-                    />
-                    <label htmlFor={`checkbox-item-${idx}`} className="ml-2">
-                      {item.name}
-                    </label>
-                    {checkboxShowTanzim[idx] && (
-                      <div className="flex flex-col gap-2 ml-6 mt-1">
-                        <label className="mb-1 text-purple-400">
-                          {item.labelInput}
-                        </label>
-                        <input
-                          className="rounded-lg border border-purple-500 bg-gray-800 text-white p-2"
-                          type={item.type}
-                          name={item.field}
-                          accept={item.accept}
-                          onChange={
-                            item.type === "file"
-                              ? (e) => handleFileChange(e, item.field)
-                              : handleInputChange
-                          }
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
+            {/* فیلدهای مشروط */}
+            {selectedCategoryIndex !== null && (
+              <div className={conditionalFieldsContainerClass}>
+                <h3 className={conditionalFieldLabelClass}>{selectGener[selectedCategoryIndex]}</h3>
+                <div>
+                  {productCategoryGroups[selectedCategoryIndex]?.fields.map((field, fieldIndex) => (
+                    <div key={fieldIndex} className={fieldItemWrapperClass}>
+                      <input type="checkbox" id={`${field.field}-checkbox-${fieldIndex}`} className={fieldCheckboxClass} checked={showFileFields[field.field] || false} onChange={() => handleToggleFieldVisibility(field.field)} />
+                      <label htmlFor={`${field.field}-checkbox-${fieldIndex}`} className={fieldLabelClass}>{field.name}</label>
+                      {showFileFields[field.field] && (
+                        <div className={specificFieldInputContainerClass}>
+                          {field.type === 'file' ? (
+                            <>
+                              <label htmlFor={`${field.field}-file`} className={labelClass}>{field.labelInput}</label>
+                              <input id={`${field.field}-file`} type="file" accept={field.accept} name={field.field} className={fileInputClass} onChange={(e) => handleFileChange(e, field.field)} />
+                              {field.note && <p className={noteTextStyle}>{field.note}</p>}
+                            </>
+                          ) : (
+                            <>
+                              <label htmlFor={field.field} className={labelClass}>{field.labelInput}</label>
+                              <input id={field.field} type={field.type} name={field.field} className={inputFieldClass} value={inputValues[field.field] || ""} onChange={handleInputChange} placeholder={field.labelInput} />
+                              {field.note && <p className={noteTextStyle}>{field.note}</p>}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
-
-            {/* Submit button */}
           </div>
-          <div className="flex justify-center p-1 mt-5">
-            <button
-              type="submit"
-              className={ButtonClassName}
-              disabled={Loading}
-            >
-              {Loading ? (
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
-                  در حال ارسال
+          {/* دکمه ارسال */}
+          <div className="mt-6 flex justify-center">
+            <button type="submit" className={submitButtonClass} disabled={loading}>
+              {loading ? (
+                <div className={loadingSpinnerContainerClass}>
+                  <div className={loadingSpinnerClass}></div>
+                  <p>در حال ارسال...</p>
                 </div>
-              ) : formData.message === "Music uploaded successfully" ? (
-                "با موفقیت آپلود شد" // تغییر به یک رشته
-              ) : formData.message === "Error uploading music" ? (
-                "خطا در آپلود"
               ) : (
-                "ارسال"
+                "ارسال اطلاعات"
               )}
             </button>
           </div>
+          {/* پیام وضعیت */}
+          {submitMessage && (
+            <p className={`${messageTextStyle} ${submitMessage.toLowerCase().includes("error") ? "text-red-400" : "text-green-400"}`}>
+              {submitMessage}
+            </p>
+          )}
         </form>
       </div>
-    </>
+    </div>
   );
 };
 
