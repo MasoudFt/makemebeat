@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IoCartSharp } from 'react-icons/io5';
 import { MdSupportAgent } from 'react-icons/md';
@@ -7,145 +7,183 @@ import { FaHeart } from 'react-icons/fa';
 import { PiUsersThreeBold } from 'react-icons/pi';
 import { VscCommentDiscussion } from 'react-icons/vsc';
 import { LiaEyeSolid } from 'react-icons/lia';
-import { postProductlist } from '../../StateManagement/Action'; // Adjust the import based on your file structure
-import { Alert, Stack } from '@mui/material'; // Ensure you have @mui/material installed
+import { postProductlist } from '../../StateManagement/Action'; // اطمینان از صحت وارد کردن
+import { Alert, Stack, Checkbox, FormGroup, FormControlLabel, Box, Typography, TextField } from '@mui/material'; // Import MUI components
 
 const SectionLeft = ({ OneMusicInfo }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const StyleDivfather1 = "row-span-3 text-white drop-shadow-xl rounded-lg gap-4 shadow-xl border-2 border-zinc-800";
-  const StyleDivChild = "flex border-b-2";
-  const StyleDivChild1 = "p-2 grid justify-items-start items-center";
-  const StyleDivChild2 = "p-2 grid justify-items-start items-center";
-
-  const [checked, setChecked] = useState({
-    t1: false,
-    t2: false,
-    t3: false,
+  const [selectedVersions, setSelectedVersions] = useState({
+    project: false,
+    wave: false,
+    mp3: false,
   });
 
-  const handleChange = (event) => {
-    const { name, checked: isChecked } = event.target;
-    setChecked((prev) => ({
+  const [quantity, setQuantity] = useState(1);
+  const [alertMessage, setAlertMessage] = useState(null); // State for alert message
+
+  const handleVersionChange = (event) => {
+    const { name, checked } = event.target;
+    setSelectedVersions((prev) => ({
       ...prev,
-      [name]: isChecked,
+      [name]: checked,
     }));
   };
 
   const handleAddToCart = () => {
-   
-      dispatch(postProductlist(OneMusicInfo));
-      navigate("/Card");
-  
+    if (!OneMusicInfo) {
+      setAlertMessage("لطفاً ابتدا یک موسیقی را انتخاب کنید.");
+      return;
+    }
+    if (!selectedVersions.project && !selectedVersions.wave && !selectedVersions.mp3) {
+      setAlertMessage("لطفاً حداقل یک نسخه از بیت را انتخاب کنید.");
+      return;
+    }
+    if (quantity < 1) {
+      setAlertMessage("تعداد باید حداقل 1 باشد.");
+      return;
+    }
+
+    // Dispatch action with selected info
+    dispatch(postProductlist({ ...OneMusicInfo, selectedVersions, quantity }));
+    navigate("/Card");
+    setAlertMessage(null); // Clear alert after successful action
   };
 
+  // Styling for cards
+  const cardStyles = "p-6 rounded-xl shadow-xl border border-zinc-700 bg-zinc-900 flex flex-col gap-6";
+  const iconStyles = "text-cyan-500 mr-3"; // Default icon color
+
   return (
-    <>
-      <div dir="rtl" className={StyleDivfather1}>
-        <div className={StyleDivChild}>
-          <div className={StyleDivChild1}>نوع بیت</div>
-          <div className={StyleDivChild2}>
-            <div>
-              <input
-                style={{ color: "white" }}
-                name="t1"
-                type="Checkbox"
-                checked={checked.t1}
-                onChange={handleChange}
-              />
-              پروژه بیت
-            </div>
-            <div>
-              <input
-                style={{ color: "white" }}
-                name="t2"
-                type="Checkbox"
-                checked={checked.t2}
-                onChange={handleChange}
-              />
-              نسخه wave بیت
-            </div>
-            <div>
-              <input
-                style={{ color: "white" }}
-                name="t3"
-                type="Checkbox"
-                checked={checked.t3}
-                onChange={handleChange}
-              />
-              نسخه mp3 بیت
-            </div>
-          </div>
-        </div>
-        <div>
-          <div className="p-2 m-5 text-xl justify-items-center border-2 border-dashed rounded-2xl items-center">
-            <div className="line-through decoration-red-500 decoration-2">
-              {OneMusicInfo.orginalPriceTanzim} تومان
-            </div>
-            <div className="p-2 m-5 text-3xl justify-items-center items-center">
-              {OneMusicInfo.discountPriceTanzim} تومان
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-rows-1 gap-4 p-4">
-          <div className="">
-            <input
-              type="number"
-              placeholder="تعداد"
-              className="bg-gray-800 rounded-lg border-2 h-10 w-16 p-1 border-white"
-              min={0}
-            />
-          </div>
-          <div className="grid grid-rows-3 gap-2">
-            <button
-              onClick={handleAddToCart}
-              className="flex w-full hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full"
-            >
-              <IoCartSharp className="w-20" size={25} />
-              افزودن به سبد خرید
-            </button>
-        
-            <div className="">
-              <button className="flex w-full hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full">
-                <MdSupportAgent className="w-20" size={25} />
-                دریافت پشتیبانی
-              </button>
-            </div>
-            <div className="">
-              <button className="flex w-full hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full">
-                <FaHeart className="ml-3" size={20} />
-                افزودن به لیست علاقه مندی ها
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="flex p-2 justify-evenly">
-          <div className="w-14 text-purple-700">
-            <PiUsersThreeBold size={35} />
-          </div>
-          <div dir="ltr" className="w-14 font-bold text-purple-700">0</div>
-          <div className="w-14 font-bold text-purple-700">خریداران</div>
-        </div>
-        <div className="flex mt-5 p-2 justify-evenly">
-          <div title="دیدگاه" className="w-14 text-yellow-500 mr-4">
-            <VscCommentDiscussion size={30} />
-          </div>
-          <div className="cursor-help w-14 font-bold text-yellow-500">0</div>
-          <div title="بازدید" className="w-14 text-yellow-500 mr-4">
-            <LiaEyeSolid size={30} />
-          </div>
-          <div className="cursor-help w-14 font-bold text-yellow-500">
-            {OneMusicInfo.view}
-          </div>
+    <div className="flex flex-col gap-6">
+
+      {/* Alert Message Display */}
+      {alertMessage && (
+        <Alert severity="warning" onClose={() => setAlertMessage(null)}>
+          {alertMessage}
+        </Alert>
+      )}
+
+      {/* Price and Version Selection Card */}
+      <div className={cardStyles}>
+        {/* Price Display */}
+        <div className="text-center">
+          {OneMusicInfo.orginalPriceTanzim && (
+            <Typography variant="overline" className="line-through decoration-red-500 decoration-2 text-gray-400">
+              {`${OneMusicInfo.orginalPriceTanzim.toLocaleString()} تومان`}
+            </Typography>
+          )}
+          <Typography variant="h4" className="font-bold text-cyan-400">
+            {OneMusicInfo.discountPriceTanzim ? `${OneMusicInfo.discountPriceTanzim.toLocaleString()} تومان` : "رایگان"}
+          </Typography>
         </div>
 
-        {/* Display alert message if it exists */}
-       
+        {/* Version Selection */}
+        <FormGroup>
+          <Typography variant="h6" gutterBottom className="text-gray-300">نوع بیت:</Typography>
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="project"
+                checked={selectedVersions.project}
+                onChange={handleVersionChange}
+                sx={{ color: "white", '&.Mui-checked': { color: 'cyan' } }}
+              />
+            }
+            label={<Typography className="text-white">پروژه بیت</Typography>}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="wave"
+                checked={selectedVersions.wave}
+                onChange={handleVersionChange}
+                sx={{ color: "white", '&.Mui-checked': { color: 'cyan' } }}
+              />
+            }
+            label={<Typography className="text-white">نسخه Wave بیت</Typography>}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="mp3"
+                checked={selectedVersions.mp3}
+                onChange={handleVersionChange}
+                sx={{ color: "white", '&.Mui-checked': { color: 'cyan' } }}
+              />
+            }
+            label={<Typography className="text-white">نسخه MP3 بیت</Typography>}
+          />
+        </FormGroup>
+
+        {/* Quantity and Add to Cart */}
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <TextField
+            variant="outlined"
+            type="number"
+            label="تعداد"
+            value={quantity}
+            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+           
+            className="w-full sm:w-24"
+            min={1}
+            size="small"
+          />
+          <button
+            onClick={handleAddToCart}
+            className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-br from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-75 w-full"
+          >
+            <IoCartSharp size={24} />
+            افزودن به سبد خرید
+          </button>
+        </div>
       </div>
-    </>
+
+      {/* Actions and Stats Card */}
+      <div className={cardStyles}>
+        {/* Support Button */}
+        <button className="flex items-center gap-3 text-white font-semibold py-3 px-4 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+          <MdSupportAgent size={30} className={iconStyles} />
+          دریافت پشتیبانی
+        </button>
+
+        {/* Favorites Button */}
+        <button className="flex items-center gap-3 text-white font-semibold py-3 px-4 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
+          <FaHeart size={22} className="ml-2 text-pink-500" />
+          افزودن به علاقه‌مندی‌ها
+        </button>
+
+        {/* Buyer/View Stats */}
+        <div className="flex flex-col xs:flex-row justify-between xs:items-center gap-4 xs:gap-0 py-4 border-t border-zinc-700">
+         
+          <div className="flex items-center gap-2">
+            <PiUsersThreeBold size={30} className="text-purple-500" />
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-purple-500">0</span>
+              <span className="text-sm text-gray-400">خریداران</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <VscCommentDiscussion size={26} className="text-yellow-500" />
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-yellow-500">0</span>
+              <span className="text-sm text-gray-400">دیدگاه</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <LiaEyeSolid size={30} className="text-green-500" />
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-green-500">{OneMusicInfo.view || 0}</span>
+              <span className="text-sm text-gray-400">بازدید</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default SectionLeft;
-

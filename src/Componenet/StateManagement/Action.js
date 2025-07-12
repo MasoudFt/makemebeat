@@ -4,7 +4,7 @@ export const login = (email, password) => {
   return async (dispatch) => {
     try {
       // const response = await axios.post(`${ServerURL()}users/login`, {
-      const response = await axios.post(`http://localhost:3001/users/login`, {
+      const response = await axios.post(`http://localhost:3000/users/login`, {
         email,
         password,
       });

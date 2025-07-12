@@ -36,7 +36,7 @@ const Dashbord = () => {
     const getData = async () => {
       try {
         // const response = await axios.get(`${ServerURL()}users/${tokenUserId}`, {
-        const response = await axios.get(`http://localhost:3001/users/${tokenUserId}`, {
+        const response = await axios.get(`http://localhost:3000/users/${tokenUserId}`, {
           // headers: {
           //   Authorization: `Bearer ${token}`, 
           // },
@@ -69,9 +69,8 @@ const Dashbord = () => {
       {isAdmin ? (
         <AdminDashbord />
       ) : (
-        <div dir="rtl" className="grid grid-cols-1 md:grid-cols-5 p-2 gap-8 md:gap-10">
-  {/* Sidebar - در موبایل کل عرض را می‌گیرد و در دسکتاپ 1/5 */}
-  <div className="col-span-1">
+<div dir="rtl" className="grid grid-cols-1 md:grid-cols-5 gap-4">
+  <div className="col-span-1 mb-4 md:mb-0">
     <Sidebar
       profilepic={userInfo?.profile_path}
       username={userInfo?.username}
@@ -79,9 +78,7 @@ const Dashbord = () => {
     />
   </div>
 
-  {/* محتوای اصلی - در موبایل کل عرض و در دسکتاپ 4/5 */}
   <div className="col-span-4 mt-4 md:mt-14 mb-5 min-h-screen">
-    {/* هدر با دو ستون در دسکتاپ و یک ستون در موبایل */}
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
       <div>
         <Head type={userInfo?.seller === 0} />
@@ -91,12 +88,12 @@ const Dashbord = () => {
       </div>
     </div>
 
-    {/* بخش اصلی محتوا */}
     <div className="border-t-2 border-purple-600 rounded-lg mt-6 md:mt-10 p-2">
       <Main />
     </div>
   </div>
 </div>
+
 
       )}
     </>

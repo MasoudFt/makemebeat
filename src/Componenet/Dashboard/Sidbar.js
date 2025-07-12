@@ -92,7 +92,7 @@ const Sidbar = ({ username, type,profilepic }) => {
           show
             ? "w-14 shadow-xl shadow-purple-500"
             : "w-64 shadow-md shadow-purple-700"
-        } flex flex-col  fixed z-50 bg-zinc-950 h-screen text-white `}
+        } flex flex-col  fixed z-50 bg-zinc-950 h-screen text-white  `}
       >
         <div className="mb-5 ml-2 rounded-2xl border-2 border-zinc-950 border-b-purple-900 ">
           <div dir="ltr">

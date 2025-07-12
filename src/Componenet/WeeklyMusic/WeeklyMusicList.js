@@ -24,8 +24,8 @@ const WeeklyMusicList = () => {
   const getMusic = useCallback(async () => {
     try {
       setLoading(true);
-      const url = `${ServerURL()}musics`;
-      // const url = `http://localhost:3000/musics`;
+      // const url = `${ServerURL()}musics`;
+      const url = `http://localhost:3000/musics`;
       const res = await axios.get(url);
       setMusicList(res.data);
       console.log(res.data)

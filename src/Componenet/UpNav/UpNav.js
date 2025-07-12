@@ -74,7 +74,7 @@ const UpNav = () => {
        {/* User Profile Button */}
        <div
           onClick={() => navigate(SignIcon.path)}
-          className="font-extrabold md:w-32 max-md:w-24 m-2 flex items-center justify-between h-10 rounded-lg p-1 relative cursor-pointer before:content-[''] before:absolute before:w-[20px] before:h-[20px] before:transition-all after:content-[''] after:absolute after:w-[20px] after:h-[20px] after:transition-all before:top-[-5px] before:left-[-5px] before:border-t before:border-l before:border-purple-800 after:bottom-[-5px] after:right-[-5px] after:border-b after:border-r after:border-purple-800 before:hover:w-[calc(100%+9px)] before:hover:h-[calc(100%+9px)] after:hover:w-[calc(100%+9px)] after:hover:h-[calc(100%+9px)] text-white hover:text-blue-400"
+          className={`${location.pathname === "/dashbord"?"hidden":"show"} font-extrabold md:w-32 max-md:w-24 m-2 flex items-center justify-between h-10 rounded-lg p-1 relative cursor-pointer before:content-[''] before:absolute before:w-[20px] before:h-[20px] before:transition-all after:content-[''] after:absolute after:w-[20px] after:h-[20px] after:transition-all before:top-[-5px] before:left-[-5px] before:border-t before:border-l before:border-purple-800 after:bottom-[-5px] after:right-[-5px] after:border-b after:border-r after:border-purple-800 before:hover:w-[calc(100%+9px)] before:hover:h-[calc(100%+9px)] after:hover:w-[calc(100%+9px)] after:hover:h-[calc(100%+9px)] text-white hover:text-blue-400`}
         >
           <AiOutlineUser size={isMobile ? 20 : 30} className="ml-1" />
           <span className="text-sm md:text-base">{SignIcon.name}</span>
@@ -130,7 +130,7 @@ const UpNav = () => {
       {/* Mobile Menu Overlay */}
       {menuOpen && isMobile && (
         <div className="fixed inset-0 z-40 bg-black bg-opacity-80 mt-16 ">
-          <div className={`bg-zinc-900 ${location.pathname === "/dashbord"?"p-16 ":"p-4"} h-fit rounded-b-lg shadow-lg overflow-y-scroll"`}>
+          <div className={`bg-zinc-900 ${location.pathname === "/dashbord"?"p-4 ":"p-4"} h-fit rounded-b-lg shadow-lg overflow-y-scroll"`}>
               {/* Mobile Icon Buttons */}
               <div className="flex justify-around mt-2 border-b border-zinc-700 pt-2">
               <div 
@@ -155,7 +155,7 @@ const UpNav = () => {
               </div>
             </div>
             {/* Mobile Navigation Items */}
-            <div className="flex flex-col space-y-4 ">
+            <div className="flex flex-col space-y-4 text-center items-center  h-64 overflow-y-scroll ">
               {navItems.map((item) => (
                 <div
                   key={item.name}
