@@ -44,7 +44,7 @@ function App() {
     // اگر زمان ذخیره شده وجود داشته باشد
     if (storedTime) {
       const timeElapsed = currentTime - storedTime;
-      console.log(timeElapsed);
+    
       // اگر بیشتر از یک دقیقه گذشته باشد
       if (timeElapsed > 360000) { // 60000 میلی‌ثانیه برابر با یک دقیقه است
         localStorage.removeItem('cart');
