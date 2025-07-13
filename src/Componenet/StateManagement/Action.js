@@ -3,8 +3,8 @@ import ServerURL from "../API/ServerURL";
 export const login = (email, password) => {
   return async (dispatch) => {
     try {
-      // const response = await axios.post(`${ServerURL()}users/login`, {
-      const response = await axios.post(`http://localhost:3000/users/login`, {
+      const response = await axios.post(`${ServerURL()}users/login`, {
+      // const response = await axios.post(`http://localhost:3000/users/login`, {
         email,
         password,
       });
@@ -50,27 +50,20 @@ export const fetchurlMuiscFile = (data) => {
     }
   };
 };
-let cart = [];
+
 
 export const postProductlist = (data) => {
-  return async (dispatch) => {
-    const infoAlretTitle=data.title
-    const infoAlretArtistName=data.artistName
-    try {
-      const productExists = cart.some(item => item.post_id === data.post_id);
-      
-      if (productExists) {
-      
-        dispatch({ type: "Alret", payload: ` محصولی به اسم ${infoAlretTitle} از هنرمند  ${infoAlretArtistName} قبلا به سبد خرید اضافه شده است.` });
-        return; 
-      }
+  return (dispatch, getState) => { 
+    const { cart } = getState().cartLit; 
+    const infoAlretTitle = data.title;
+    const infoAlretArtistName = data.artistName;
 
-      cart.push(data); 
-      dispatch({ type: "postProductlist", payload: data });
-     
-    } catch (error) {
-      console.log(error);
+    const productExists = cart.some(item => item.post_id === data.post_id);
+    if (productExists) {
+      dispatch({ type: "Alret", payload: ` محصولی به اسم ${infoAlretTitle} از هنرمند  ${infoAlretArtistName} قبلا به سبد خرید اضافه شده است.` });
+      return;
     }
+    dispatch({ type: "postProductlist", payload: data }); 
   };
 };
 export const removeFromCart = (newCart) => {

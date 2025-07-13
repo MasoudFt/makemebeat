@@ -1,11 +1,9 @@
 import React from "react";
 import Skeleton from '@mui/material/Skeleton';
-import { GiMusicalScore } from "react-icons/gi";
 import Stack from '@mui/material/Stack';
 import { GiMetronome } from "react-icons/gi";
 import { PiMicrophoneStage } from "react-icons/pi";
 import { BsFileMusic } from "react-icons/bs";
-// import { FaCheckerboard } from "react-icons/fa"; // این آیکون مشکل داشت
 import { TbBuilding } from "react-icons/tb"; // یک آیکون جایگزین برای نمایش پروژه
 import { MdOutlineSubtitles } from "react-icons/md"; // آیکون مناسب‌تر برای توضیحات
 

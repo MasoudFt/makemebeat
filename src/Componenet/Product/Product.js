@@ -8,7 +8,7 @@ const Product = () => {
   const OneMusicInfo = useSelector((state) => state.MusicInfo);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-zinc-950 text-white p-4 md:p-8 lg:p-16">
+    <div dir="rtl" className="min-h-screen mt-8 bg-zinc-950 text-white p-4 md:p-8 lg:p-16">
     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8"> 
 
       {/* SectionLeft (Menu/Navigation Side) */}

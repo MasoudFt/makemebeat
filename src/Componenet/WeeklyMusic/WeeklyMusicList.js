@@ -24,11 +24,10 @@ const WeeklyMusicList = () => {
   const getMusic = useCallback(async () => {
     try {
       setLoading(true);
-      // const url = `${ServerURL()}musics`;
-      const url = `http://localhost:3000/musics`;
+      const url = `${ServerURL()}musics`;
+      // const url = `http://localhost:3000/musics`;
       const res = await axios.get(url);
       setMusicList(res.data);
-      console.log(res.data)
     } catch (error) {
       console.log(error.response);
     } finally {
@@ -126,7 +125,7 @@ const WeeklyMusicList = () => {
                     )
                   }
                     
-                    <div className="relative h-72 w-full overflow-hidden">
+                    <div className="relative  w-full overflow-hidden">
                       <LazyLoadImage
                         alt={a.title}
                         src={!a.file_pathImage ? "12-1024x745-1-5.png" : FinalUrl + a.file_pathImage}

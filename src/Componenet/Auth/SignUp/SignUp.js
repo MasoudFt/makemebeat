@@ -91,8 +91,8 @@ const SignUp = () => {
 
   const postUser = async () => {
     try {
-      // const { data } = await axios.post(`${ServerURL()}users/register`, {
-      const { data } = await axios.post(`http://localhost:3001/users/register`, {
+      const { data } = await axios.post(`${ServerURL()}users/register`, {
+      // const { data } = await axios.post(`http://localhost:3001/users/register`, {
         username: user.name || null,
         email: user.email || null,
         password: user.password || null,

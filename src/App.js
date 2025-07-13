@@ -1,7 +1,6 @@
 
 import "./App.css";
 import React, { useState, useEffect } from "react";
-import Navbar from "../src/Componenet/Navbar/Navbar";
 import About from "../src/Componenet/About/About";
 import News from "../src/Componenet/News/News"
 import Login from "../src/Componenet/Auth/Login/Login";
@@ -69,13 +68,6 @@ function App() {
             }`}
           >
             <UpNav />
-          </div>
-          <div
-            className={`${
-              location.pathname.startsWith("/dashbord") ? "hidden" : ""
-            }`}
-          >
-            <Navbar />
           </div>
 
           <div className="bg-zinc-950 ">

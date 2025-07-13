@@ -35,8 +35,8 @@ const Dashbord = () => {
     setIsAdmin(adminStatus === "true");
     const getData = async () => {
       try {
-        // const response = await axios.get(`${ServerURL()}users/${tokenUserId}`, {
-        const response = await axios.get(`http://localhost:3000/users/${tokenUserId}`, {
+        const response = await axios.get(`${ServerURL()}users/${tokenUserId}`, {
+        // const response = await axios.get(`http://localhost:3000/users/${tokenUserId}`, {
           // headers: {
           //   Authorization: `Bearer ${token}`, 
           // },

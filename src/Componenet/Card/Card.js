@@ -6,6 +6,7 @@ import { Alert, Stack } from '@mui/material';
 import ServerURL from '../API/ServerURL';
 const Card = () => {
 const { cart, alert }=useSelector((state)=>state.cartLit)
+console.log(cart)
 const userCartList = localStorage.getItem("cart")
 const imageUrl=ServerURL();
 const dispatch = useDispatch();

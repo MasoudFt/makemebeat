@@ -56,7 +56,7 @@ const SectionLeft = ({ OneMusicInfo }) => {
   const iconStyles = "text-cyan-500 mr-3"; // Default icon color
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 max-md:mt-10">
 
       {/* Alert Message Display */}
       {alertMessage && (
@@ -119,25 +119,33 @@ const SectionLeft = ({ OneMusicInfo }) => {
 
         {/* Quantity and Add to Cart */}
         <div className="flex flex-col sm:flex-row items-center gap-4">
-          <TextField
-            variant="outlined"
-            type="number"
-            label="تعداد"
-            value={quantity}
-            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-           
-            className="w-full sm:w-24"
-            min={1}
-            size="small"
-          />
-          <button
-            onClick={handleAddToCart}
-            className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-br from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-75 w-full"
-          >
-            <IoCartSharp size={24} />
-            افزودن به سبد خرید
-          </button>
-        </div>
+  <TextField
+    variant="outlined"
+    type="number"
+    label="تعداد"
+    value={quantity}
+    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+    className="w-full sm:w-24 text-white border-2 border-white"
+    min={1}
+    InputProps={{
+      style: {
+        color: 'white' 
+      }
+    }}
+    InputLabelProps={{
+      style: {
+        color: 'white' 
+      }
+    }}
+  />
+  <button
+    onClick={handleAddToCart}
+    className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-br from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-75 w-full sm:w-auto sm:px-4"
+  >
+    <IoCartSharp size={24} />
+    افزودن به سبد خرید
+  </button>
+</div>
       </div>
 
       {/* Actions and Stats Card */}

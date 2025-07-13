@@ -87,26 +87,15 @@ export const postUrlMuiscFile=(state=[],action)=>{
 export const postProductlist = (state = { cart: [], alert: null }, action) => {
     switch (action.type) {
       case "postProductlist":
-        const updatedCartAdd = [...state.cart, action.payload];
-        localStorage.setItem('cart', JSON.stringify(updatedCartAdd));
-        return { ...state, cart: updatedCartAdd, alert: null };
+        return { ...state, cart: [...state.cart, action.payload], alert: null };
   
       case "Alret":
         return { ...state, alert: action.payload };
   
-      case "UPDATE_CART":
-        // زمانی که اکشن برای به‌روزرسانی سبد فراخوانی شد، ابتدا چک می‌کنیم localStorage سبد دارد یا نه
-        const userCartList = localStorage.getItem("cart");
-        if (!userCartList) {
-          // اگر localStorage خالی بود، سبد خرید را پاک کن
-          return { ...state, cart: [] }; // وضعیت سبد خرید را به آرایه خالی تنظیم می‌کند
-        }
-        // اگر سبد خرید وجود داشته باشد، آن را به‌روزرسانی می‌کنیم
-        localStorage.setItem('cart', JSON.stringify(action.payload));
+      case "UPDATE_CART": 
         return { ...state, cart: action.payload };
-  
+
       default:
         return state;
     }
   };
-  

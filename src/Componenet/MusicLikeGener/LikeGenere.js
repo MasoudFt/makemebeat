@@ -74,7 +74,7 @@ const LikeGenere = ({ OneMusicInfo }) => {
     currentSlide + itemsPerPage
   );
 
-  // مدیریت اسلایدها (فقط اگر موسیقی وجود داشته باشد، پیکان‌ها فعال هستند)
+
   const canSlide = totalItems > itemsPerPage && totalItems > 0;
 
   const handelNextIndexPic = useCallback(() => {
