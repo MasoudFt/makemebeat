@@ -169,6 +169,7 @@ const VideoPlayer = ({ url, thumbnail }) => {
       <video
         ref={videoRef}
         src={`${ServerUrl()}uploads//videos//demoVideofile-1748607121287-169446406.mp4`}
+        // src={`http://localhost:3000/uploads//videos//demoVideofile-1749744122088-447306486.mp4`}
         className="w-full aspect-video p-1 rounded-lg"
         onClick={togglePlayPause}
         onTimeUpdate={handleTimeUpdate}

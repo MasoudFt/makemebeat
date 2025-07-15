@@ -30,8 +30,8 @@ const WeeklyMusicList = () => {
       const res = await axios.get(url);
       setMusicList(res.data);
     } catch (error) {
-      console.log(error.response);
-      setError(error.response.data)
+      console.log(error);
+      setError(error.response && error.response.data !== undefined ? error.response.data : error.message);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,5 @@
-import React, {useState } from "react";
-import { MdKeyboardArrowLeft } from "react-icons/md";
-import { MdKeyboardArrowRight } from "react-icons/md";
+import React, { useEffect, useState } from "react";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { BsBasket3 } from "react-icons/bs";
 import { FaRegComments } from "react-icons/fa6";
@@ -11,172 +10,176 @@ import { MdAddShoppingCart } from "react-icons/md";
 import { RiPlayList2Fill } from "react-icons/ri";
 import { BsCardList } from "react-icons/bs";
 import { VscAccount } from "react-icons/vsc";
+import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import ServerURL from "../API/ServerURL";
-const Sidbar = ({ username, type,profilepic }) => {
-  const convertPath = (filePath) => {
-    if(profilepic === null){
-      return null
-    }else{
-      return filePath.replace(/\\/g, '/');
-  }
-  };
-  const url = `${ServerURL()}${convertPath(profilepic)}`
+
+const Sidebar = ({ username, type, profilepic }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 780);
   const [show, setShow] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("authToken");
 
-
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 780);
+    };
     
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const convertPath = (filePath) => {
+    if (!profilepic) return null;
+    return filePath.replace(/\\/g, '/');
+  };
+
+  const url = `${ServerURL()}${convertPath(profilepic)}`;
   
+  if (!token) {
+    navigate("/login");
+    return null;
+  }
 
   const handleLogout = () => {
-    // پاک کردن اطلاعات از localStorage
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("username");
-
+    localStorage.clear();
     navigate("/login");
-
-    // window.location.reload();
   };
 
   const input = [
-    { name: "اطلاعات تکمیلی", path: "", Icon: <BsCardList size={25} /> },
-    {
-      name: `${type ? "سفارش های من" : "محصولات من "}`,
-      path: "MyProductList",
-      Icon: <IoDocumentTextOutline size={25} />,
-    },
-    {
-      name: `${type ? "ثبت سفارش" : "ثبت محصول"}`,
-      path: "ComposeProduct",
-      Icon: <MdAddShoppingCart size={25} />,
-    },
-    {
-      name: `${type ? "خریدهای من" : "فروش های من"}`,
-      path: "MyPurchase",
-      Icon: <BsBasket3 size={25} />,
-    },
-    {
-      name: `${type ? "نظرهای من" : "نظرات برای محصولات من "}`,
-      path: "CommentList",
-      Icon: <FaRegComments size={25} />,
-    },
-    {
-      name: `${type ? "دانلود ها" : "دانلود محصولات من "}`,
-      path: "DownloadList",
-      Icon: <LuDownload size={25} />,
-    },
-    { name: "کیف پول", path: "Wallet", Icon: <SlWallet size={25} /> },
-    {
-      name: `${type ? "تیکت های خریدار" : "تیکت های فروشنده"}`,
-      path: "Ticket",
-      Icon: <LuTicketCheck size={25} />,
-    },
-    {
-      name: `${type ? "لیست علاقه مندی ها" : "مشتری های برتر "}`,
-      path: "FavList",
-      Icon: <RiPlayList2Fill size={25} />,
-    },
+    { name: "اطلاعات تکمیلی", path: "", Icon: <BsCardList /> },
+    { name: `${type ? "سفارش های من" : "محصولات من"}`, path: "MyProductList", Icon: <IoDocumentTextOutline /> },
+    { name: `${type ? "ثبت سفارش" : "ثبت محصول"}`, path: "ComposeProduct", Icon: <MdAddShoppingCart /> },
+    { name: `${type ? "خریدهای من" : "فروش های من"}`, path: "MyPurchase", Icon: <BsBasket3 /> },
+    { name: `${type ? "نظرهای من" : "نظرات محصولات"}`, path: "CommentList", Icon: <FaRegComments /> },
+    { name: `${type ? "دانلودها" : "دانلود محصولات"}`, path: "DownloadList", Icon: <LuDownload /> },
+    { name: "کیف پول", path: "Wallet", Icon: <SlWallet /> },
+    { name: "تیکت ها", path: "Ticket", Icon: <LuTicketCheck /> },
+    { name: `${type ? "علاقه مندی ها" : "مشتری های برتر"}`, path: "FavList", Icon: <RiPlayList2Fill /> }
   ];
+
   return (
     <>
-      <div
-        className={`${
-          show
-            ? "w-14 shadow-xl shadow-purple-500"
-            : "w-64 shadow-md shadow-purple-700"
-        } flex flex-col  fixed z-50 bg-zinc-950 h-screen text-white  `}
-      >
-        <div className="mb-5 ml-2 rounded-2xl border-2 border-zinc-950 border-b-purple-900 ">
-          <div dir="ltr">
-            <div className="relative">
-              {show ? (
-                <MdKeyboardArrowLeft
-                  size={20}
-                  onClick={() => setShow(false)}
-                  className="relative end-0 top-6 -left-4 bg-purple-700 rounded-full"
-                  />
-              ) : (
-                <MdKeyboardArrowRight
-                  size={20}
-                  onClick={() => setShow(true)}
-                  className="relative end-0 top-6 -left-4 bg-purple-700 rounded-full"
-                />
-              )}
-              <div dir="rtl" className="flex"></div>
-            </div>
-          </div>
-          <div className="grid place-content-start py-2 px-3">
-            {profilepic === null ? (
-              <VscAccount size={show ? "25" : "65"} />
-            ) : (
-              <img 
-              src={url} 
-              className={show?"h-6 w-6 rounded-full" : "h-20 w-20  border-2 border-purple-600 rounded-full"} />
-            )}
-            <div className="flex justify-between w-56 gap-4">
-              <label
-                className={show ? "hidden" : "p-2 mt-3 font-bold text-xs text-zinc-350"}
-              >
-                نام کاربری : {username}
-              </label>
-              <button
-                className={
-                  show
-                    ? "hidden"
-                    : `${
-                        type ? " bg-green-500" : " bg-red-500"
-                      } relative z-50 w-18 py-2 px-2 mt-5 rounded-2xl text-xs font-bold text-black text-center `
-                }
-              >
-                {type ? "خریدار" : "فروشنده"}
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* دسکتاپ */}
+      {!isMobile && (
         <div
           className={`${
-            show ? "overflow-y-hidden overflow-x-hidden" : "overflow-y-auto"
-          } row-span-5 text-sm font-bold`}
-          style={{ maxHeight: 'calc(100vh - 100px)', /* Adjust height as needed */ }}
+            show ? "w-14 shadow-xl shadow-purple-500" : "w-64 shadow-md shadow-purple-700"
+          } flex flex-col fixed z-50 bg-zinc-950 h-screen text-white`}
         >
-          <div className="flex flex-col justify-between  gap-2 p-1">
-            {input.map((a, b) => (
-              <div
-                className="flex  hover:text-purple-500 hover:mr-2 hover:border-b-2 border-white"
-                key={a.name}
+          {/* محتوای سایدبار دسکتاپ */}
+          <div className="mb-5 ml-2 rounded-2xl border-2 border-zinc-950 border-b-purple-900">
+            <div className="relative">
+              <button
+                onClick={() => setShow(!show)}
+                className="absolute top-6 -left-4 bg-purple-700 rounded-full p-1"
               >
-                <div className="p-1 mr-2 ">{a.Icon}</div>
-                <div
-                  className={`${show ? "opacity-0" : "opacity-100 mt-2"} h-14`}
-                  onClick={() => {navigate(`/dashbord/${a.path}`);setShow(true)}}
-                >
-                  {a.name}
+                {show ? <MdKeyboardArrowLeft size={18} /> : <MdKeyboardArrowRight size={18} />}
+              </button>
+            </div>
+            <div className="grid place-content-start py-2 px-3">
+              {profilepic ? (
+                <img src={url} className={`${show ? "h-8 w-8" : "h-20 w-20"} rounded-full border-2 border-purple-600`} />
+              ) : (
+                <VscAccount size={show ? 25 : 65} />
+              )}
+               </div>
+              {!show && (
+                <div className="flex justify-around items-center m-3">
+                  <span className="text-xs font-bold">{username}</span>
+                  <span className={`${type ? "bg-green-500" : "bg-red-500"} px-2 py-1 rounded text-xs`}>
+                    {type ? "خریدار" : "فروشنده"}
+                  </span>
                 </div>
-              </div>
+              )}
+           
+          </div>
+
+          <div className="overflow-y-auto flex-grow row-span-5 custom-scroll">
+            {input.map((item) => (
+              <NavItem 
+                key={item.name}
+                item={item}
+                show={show}
+                onClick={() => navigate(`/dashbord/${item.path}`)}
+              />
             ))}
           </div>
+
+          {!show && (
+            <button
+              onClick={handleLogout}
+              className="m-2 bg-white text-black py-2 rounded-lg"
+            >
+              خروج
+            </button>
+          )}
         </div>
-        <div className="flex justify-center row-span-1">
-          <button
-            onClick={handleLogout}
-            className={`${
-              show ? "opacity-20 cursor-not-allowed" : "opacity-100"
-            } rounded-xl bg-white text-black p-2 m-2`}
+      )}
+
+      {/* موبایل */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 bg-zinc-950 z-50 border-t border-purple-800">
+          <button 
+            onClick={() => setExpanded(!expanded)}
+            className="w-full flex justify-center py-2 bg-zinc-900 text-purple-400"
           >
-            خروج
+            {expanded ? <FaChevronDown /> : <FaChevronUp />}
           </button>
+
+          {expanded && (
+            <div className="grid grid-cols-4 gap-2 p-2 bg-zinc-950">
+              {input.map((item) => (
+                <MobileNavItem 
+                  key={item.name}
+                  item={item}
+                  onClick={() => {
+                    navigate(`/dashbord/${item.path}`);
+                    setExpanded(false);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          {!expanded && (
+            <div className="flex justify-around p-2">
+              {input.slice(0, 5).map((item) => (
+                <MobileNavItem 
+                  key={item.name}
+                  item={item}
+                  onClick={() => navigate(`/dashbord/${item.path}`)}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </>
   );
 };
 
-export default Sidbar;
+// کامپوننت آیتم‌های دسکتاپ
+const NavItem = ({ item, show, onClick }) => (
+  <div
+    onClick={onClick}
+    className={`flex items-center p-3 hover:bg-zinc-800 cursor-pointer ${!show && "border-b border-zinc-800"}`}
+  >
+    <span className={`${show ? "mx-auto" : "ml-2"}`}>{item.Icon}</span>
+    {!show && <span className="mr-2">{item.name}</span>}
+  </div>
+);
+
+// کامپوننت آیتم‌های موبایل
+const MobileNavItem = ({ item, onClick }) => (
+  <div
+    onClick={onClick}
+    className="flex flex-col text-white items-center p-2 hover:bg-zinc-800 rounded cursor-pointer"
+  >
+    <div >{item.Icon}</div>
+    <span className="text-xs mt-1 text-center">{item.name}</span>
+  </div>
+);
+
+export default Sidebar;

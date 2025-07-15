@@ -10,6 +10,7 @@ import ServerURL from "../API/ServerURL";
 
 const Dashbord = () => {
   const [loading, setLoading] = useState(true);
+
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -21,6 +22,8 @@ const Dashbord = () => {
 
 
   useEffect(() => {
+
+   
     if (!token) {
       navigate("/login");
       return;
@@ -66,37 +69,37 @@ const Dashbord = () => {
 
   return (
     <>
-      {isAdmin ? (
-        <AdminDashbord />
-      ) : (
-<div dir="rtl" className="grid grid-cols-1 md:grid-cols-5 gap-4">
-  <div className="col-span-1 mb-4 md:mb-0">
-    <Sidebar
-      profilepic={userInfo?.profile_path}
-      username={userInfo?.username}
-      type={userInfo?.seller === 0}
-    />
-  </div>
-
-  <div className="col-span-4 mt-4 md:mt-14 mb-5 min-h-screen">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-      <div>
-        <Head type={userInfo?.seller === 0} />
+    {isAdmin ? (
+      <AdminDashbord />
+    ) : (
+      <div dir="rtl" className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="col-span-1 mb-4 md:mb-0">
+          <Sidebar
+            profilepic={userInfo?.profile_path}
+            username={userInfo?.username}
+            type={userInfo?.seller === 0}
+       
+          />
+        </div>
+  
+        <div className="col-span-4 mt-4 md:mt-14 mb-5 min-h-screen">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div>
+              <Head type={userInfo?.seller === 0} />
+            </div>
+            <div>
+              <Head type={userInfo?.seller === 0} />
+            </div>
+          </div>
+  
+          <div className="border-t-2 border-purple-600 rounded-lg mt-6 mb-16 md:mt-10 p-2">
+            <Main />
+          </div>
+        </div>
       </div>
-      <div>
-        <Head type={userInfo?.seller === 0} />
-      </div>
-    </div>
-
-    <div className="border-t-2 border-purple-600 rounded-lg mt-6 md:mt-10 p-2">
-      <Main />
-    </div>
-  </div>
-</div>
-
-
-      )}
-    </>
+    )}
+  </>
+  
   );
 };
 

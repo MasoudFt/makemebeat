@@ -16,7 +16,7 @@ const port = 3000;
 // Middleware
 const authenticate = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // استخراج توکن از هدر
-console.log(token)
+// console.log(token)
   if (!token) {
     return res.status(401).send("Access denied. No token provided.");
   }
@@ -133,8 +133,7 @@ app.put("/users/update/:userId", upload2.single('image'), async (req, res) => {
 // ورود کاربر
 app.post("/users/login", async (req, res) => {
   const { email, password } = req.body;
-  // console.log(email);
-  // console.log(password);
+
   
   try {
     const connection = await pool.getConnection();
@@ -418,7 +417,7 @@ app.get("/musics", async (req, res) => {
       // اگر نیاز است که مسیر فایل را به آدرس کامل اضافه کنید، این خط را uncomment کنید
       // file_path: `http://localhost:3000/${music.file_path}`,
     }));
-    console.log(musicList)
+    // console.log(musicList)
     res.json(musicList);
   } catch (error) {
     console.error('Error fetching musics:', error);
