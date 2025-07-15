@@ -133,28 +133,32 @@ app.put("/users/update/:userId", upload2.single('image'), async (req, res) => {
 // ورود کاربر
 app.post("/users/login", async (req, res) => {
   const { email, password } = req.body;
-console.log(email)
-console.log(password)
+  console.log(email);
+  console.log(password);
+  
   try {
     const connection = await pool.getConnection();
     const [results] = await connection.query("SELECT * FROM users WHERE email = ?", [email]);
     connection.release();
 
     if (results.length === 0) {
-      return res.status(401).send("User not found Back to Register");
+      return res.status(401).send("شما ثبت‌ نام نکرده‌اید");
     }
+
     const user = results[0];
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      return res.status(401).send("Invalid credentials");
+      return res.status(401).send("گذرواژه نامعتبر است");
     }
+
     const token = jwt.sign({ userID: user.userID }, process.env.JWT_SECRET, { expiresIn: "7D" });
     res.json({ token, userId: user.userID, username: user.username });
   } catch (error) {
     console.error('Error during login:', error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send("خطای داخلی سرور");
   }
 });
+
 
 // خواندن تمام کاربران
 app.get("/users", async (req, res) => {
@@ -414,7 +418,7 @@ app.get("/musics", async (req, res) => {
       // اگر نیاز است که مسیر فایل را به آدرس کامل اضافه کنید، این خط را uncomment کنید
       // file_path: `http://localhost:3000/${music.file_path}`,
     }));
-
+    console.log(musicList)
     res.json(musicList);
   } catch (error) {
     console.error('Error fetching musics:', error);
@@ -468,7 +472,7 @@ app.get("/musics/:idOrFilePath/:page/", async (req, res) => {
     } else {
       const filePath = `uploads/${idOrFilePath}`;
       const [results] = await connection.query(
-        "SELECT * FROM musics WHERE file_path = ? LIMIT ? OFFSET ?",
+        "SELECT * FROM musics WHERE file_pathMP3Orginal= ? LIMIT ? OFFSET ?",
         [filePath, limit, offset]
       );
 
@@ -545,7 +549,7 @@ app.get("/oneUserMusics/:idOrFilePath", async (req, res) => {
     } else {
       const filePath = `uploads/${idOrFilePath}`;
       const [results] = await connection.query(
-        "SELECT * FROM musics WHERE file_path = ?",
+        "SELECT * FROM musics WHERE file_pathMP3Orginal= ?",
         [filePath]
       );
 

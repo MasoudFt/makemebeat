@@ -1,46 +1,51 @@
-import { login } from "../../StateManagement/Action";
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
+import { login } from '../../StateManagement/Action'; 
 
 const Login = () => {
+  const user = useSelector(state => state.user);
+  console.log(user)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const dispatch=useDispatch();
- 
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-  
+
     if (!email.trim()) {
       setError("ایمیل را وارد کنید");
       return;
     }
-  
+
     if (!password.trim()) {
       setError("گذرواژه را وارد کنید");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       await dispatch(login(email, password));
-      navigate('/dashbord'); // در صورت موفقیت، به داشبورد هدایت می‌شود
-  
+
+      // اینجا از وضعیت کاربر قبل از تغییر استفاده می‌کنیم
+      if (!user.error && user.isAuthenticated) {
+        navigate('/dashboard'); // در صورت ورود موفق به داشبورد بروید.
+      } else {
+        setError(user.error || "وارد شدن ناموفق است. لطفا دوباره تلاش کنید.");
+      }
     } catch (err) {
       setError("وارد شدن ناموفق است. لطفا دوباره تلاش کنید.");
     } finally {
       setLoading(false);
     }
   }
-// const handleLogin=(e)=>{
-//   e.preventDefault();
-//   dispatch(login(email,password))
-// }
+
   return (
     <div
       dir="rtl"

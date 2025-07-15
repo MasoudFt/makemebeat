@@ -3,8 +3,8 @@ import ServerURL from "../API/ServerURL";
 export const login = (email, password) => {
   return async (dispatch) => {
     try {
-      const response = await axios.post(`${ServerURL()}users/login`, {
-      // const response = await axios.post(`http://localhost:3000/users/login`, {
+      // const response = await axios.post(`${ServerURL()}users/login`, {
+      const response = await axios.post(`http://localhost:3000/users/login`, {
         email,
         password,
       });
@@ -23,7 +23,8 @@ export const login = (email, password) => {
       axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
       dispatch(getUserId(response.data));
     } catch (error) {
-      dispatch({ type: "LOGIN_FAILURE", payload: "Invalid email or password" });
+      dispatch({ type: "LOGIN_FAILURE", payload:error.response.data});
+      // console.log(error)
     }
   };
 };

@@ -25,9 +25,8 @@ const MusicPlayer = ({ infoOneMusic }) => {
   const [number, setNumber] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const dispatch = useDispatch();
-  // const baseUrl = ServerURL();
-
-  const baseUrl = "http://localhost:3000/uploads/musics/03. Ever Wonder.mp3";
+  const baseUrl = ServerURL();
+  // const baseUrl = "http://localhost:3000/uploads/musics/03. Ever Wonder.mp3";
   const urlFinal = baseUrl + (infoOneMusic.file_pathtagMP3 || infoOneMusic.file_pathMP3Orginal);
   const audioRef = useRef(null);
 
@@ -117,7 +116,7 @@ const MusicPlayer = ({ infoOneMusic }) => {
       <div
         className={`h-full gap-2 md:gap-4 flex flex-row ${
           showPlayer
-            ? "bg-gradient-to-r from-gray-900 to-purple-900"
+            ? "bg-zinc-900"
             : "bg-transparent"
         } rounded-t-lg shadow-lg shadow-purple-900/50 text-white items-center transition-all duration-300 ease-in-out`}
       >
@@ -225,7 +224,7 @@ const MusicPlayer = ({ infoOneMusic }) => {
             {/* Track Info and Additional Controls */}
             {showPlayer && (
               <div className="hidden md:flex flex-col items-end w-1/4">
-                <div className="flex items-center space-x-4 mb-2">
+                <div className="flex items-center space-x-4 mt-2 p-2">
                   <button className="text-gray-300 hover:text-purple-400 transition-colors">
                     <PiHeadCircuitFill size={20} />
                   </button>
@@ -236,14 +235,14 @@ const MusicPlayer = ({ infoOneMusic }) => {
                     <MdStarRate size={20} />
                   </button>
                 </div>
-                <div className="text-right">
+                <div className="text-right mr-4">
                   <h3 className="text-sm font-semibold truncate max-w-[200px]">
                     {infoOneMusic.title}
                   </h3>
                   <p className="text-xs text-gray-400">{infoOneMusic.tempo}</p>
                   <p className="text-xs text-gray-400">{infoOneMusic.view} plays</p>
                 </div>
-                <div className="mt-2 w-full max-w-[120px]">
+                <div className="mt-2 mr-4 w-full max-w-[120px]">
                   <Slider
                     value={volume}
                     min={0}
@@ -284,7 +283,7 @@ const MusicPlayer = ({ infoOneMusic }) => {
               </div>
             )}
 
-            <audio ref={audioRef} src={baseUrl} />
+            <audio ref={audioRef} src={urlFinal} />
           </>
         ) : (
           <div className="w-full text-center">Loading...</div>
