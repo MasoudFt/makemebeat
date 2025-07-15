@@ -20,13 +20,13 @@ const WeeklyMusicList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
-  // const FinalUrl = ServerURL();
-  const FinalUrl = "http://localhost:3000/";
+  const FinalUrl = ServerURL();
+  // const FinalUrl = "http://localhost:3000/";
   const getMusic = useCallback(async () => {
     try {
       setLoading(true);
-      // const url = `${ServerURL()}musics`;
-      const url = `http://localhost:3000/musics`;
+      const url = `${ServerURL()}musics`;
+      // const url = `http://localhost:3000/musics`;
       const res = await axios.get(url);
       setMusicList(res.data);
     } catch (error) {

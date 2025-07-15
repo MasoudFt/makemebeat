@@ -1,6 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import 'typeface-vazir'; 
+body {
+  font-family: 'Vazir', sans-serif;
+}
 /* @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";  */

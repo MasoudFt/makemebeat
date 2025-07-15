@@ -23,8 +23,8 @@ console.log(token)
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // ذخیره اطلاعات کاربر در درخواست
-    next(); // ادامه اجرای میدلور
+    req.user = decoded; 
+    next(); 
   } catch (error) {
     console.error('Authentication error:', error);
     res.status(400).send("Invalid token.");
@@ -133,8 +133,8 @@ app.put("/users/update/:userId", upload2.single('image'), async (req, res) => {
 // ورود کاربر
 app.post("/users/login", async (req, res) => {
   const { email, password } = req.body;
-  console.log(email);
-  console.log(password);
+  // console.log(email);
+  // console.log(password);
   
   try {
     const connection = await pool.getConnection();

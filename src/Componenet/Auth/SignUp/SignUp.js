@@ -154,13 +154,15 @@ const SignUp = () => {
             isSignInActive ? "left-0" : "left-1/2"
           }`}
           style={{
-            backgroundImage: "url('https://i.pinimg.com/736x/ca/e1/9c/cae19c241ebcab73c557e9739344f02a.jpg')",
+            backgroundImage: "url('/SignUpPlus.png')",
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover'
           }}
         >
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center p-8 text-white">
-            <h2 className="text-2xl font-bold mb-4">خوش آمدید!</h2>
-            <p className="text-center mb-6">
-              برای استفاده از امکانات سابت لطفا اطلاعات خود را وارد کنید
+          <div className="absolute inset-0 text-black font-extrabold  bg-zinc-950 bg-opacity-40 flex flex-col items-center justify-center p-8">
+            <h2 className="text-3xl mb-12">خوش آمدید</h2>
+            <p className="text-center text-xl mt-2 mb-6">
+              برای استفاده از امکانات سایت لطفا اطلاعات خود را وارد کنید
             </p>
             <button
               className={`py-2 px-3 ${isSignInActive ? "bg-red-700" : "bg-green-700"} text-white w-24 mt-2 rounded-md hover:bg-black mb-5`}

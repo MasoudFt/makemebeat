@@ -1,35 +1,4 @@
 import axios from "axios";
-import ServerURL from "../API/ServerURL";
-export const login = (email, password) => {
-  return async (dispatch) => {
-    try {
-      // const response = await axios.post(`${ServerURL()}users/login`, {
-      const response = await axios.post(`http://localhost:3000/users/login`, {
-        email,
-        password,
-      });
-      
-      // ذخیره وضعیت ادمین در localStorage
-      if (email === "Admin@gmail.com") {
-        localStorage.setItem("isAdmin", "true");
-      } else {
-        localStorage.setItem("isAdmin", "false");
-      }
-
-      dispatch({ type: "LOGIN_SUCCESS", payload: response.data });
-      localStorage.setItem("authToken", response.data.token);
-      localStorage.setItem("username", response.data.username);
-      localStorage.setItem("userId", response.data.userId);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-      dispatch(getUserId(response.data));
-    } catch (error) {
-      dispatch({ type: "LOGIN_FAILURE", payload:error.response.data});
-      // console.log(error)
-    }
-  };
-};
-
-
 
 export const logout = (dispatch) => {
   return (dispatch) => {

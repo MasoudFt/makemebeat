@@ -63,8 +63,8 @@ const UpNav = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
+      setIsMobile(window.innerWidth < 780);
+      if (window.innerWidth >= 780) {
         setMenuOpen(false);
       }
     };
@@ -179,7 +179,7 @@ const UpNav = () => {
   {navItems.map((item, index) => (
     <div
       key={index}
-      className="relative text-white font-bold hover:text-blue-400 cursor-pointer px-2 mr-2 ml-2 transition-colors h-[10px] flex items-center"
+      className="relative text-sm text-white font-bold hover:text-blue-400 cursor-pointer px-2 mr-2 ml-2 transition-colors h-[10px] flex items-center"
       onMouseEnter={() => item.hasSubmenu && toggleExpand(item.name)}
       onMouseLeave={() => item.hasSubmenu && toggleExpand(item.name)}
       onClick={() => {
@@ -206,61 +206,67 @@ const UpNav = () => {
           {menuOpen ? <FaTimes size={24} /> : "☰"}
         </div>
       </div>
-
       {menuOpen && isMobile && (
-        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 mt-16">
-          <div className="bg-zinc-900 h-full overflow-y-auto">
-            <div className="flex justify-around p-4 border-b border-zinc-700">
-              {iconButtons.map((btn, index) => (
-                <button
-                  key={index}
-                  className="text-white hover:text-blue-400 transition-colors"
-                  onClick={btn.action || (() => navigate(btn.path))}
-                >
-                  {btn.icon}
-                  {btn.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                      {btn.badge}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            <div className="p-4">
-              {navItems.reverse().map((item) => (
-                <div key={item.name} className="mb-2">
-                  <div
-                    className={`flex justify-between items-center p-3 rounded-lg ${
-                      item.hasSubmenu ? "bg-zinc-800" : "hover:bg-zinc-800"
-                    } transition-colors`}
-                    onClick={() => {
-                      if (!item.hasSubmenu) {
-                        navigate(item.path);
-                        setMenuOpen(false);
-                      } else {
-                        toggleExpand(item.name);
-                      }
-                    }}
-                  >
-                    <span className="text-white font-bold">{item.name}</span>
-                    {item.hasSubmenu &&
-                      (expandedItems[item.name] ? (
-                        <FaChevronUp className="text-zinc-400" />
-                      ) : (
-                        <FaChevronDown className="text-zinc-400" />
-                      ))}
-                  </div>
-
-                  {item.hasSubmenu &&
-                    expandedItems[item.name] &&
-                    renderSubmenu(item.name)}
-                </div>
-              ))}
-            </div>
+  <div dir="rtl" className="fixed inset-0 z-40 bg-black bg-opacity-50 mt-16">
+    <div className="bg-zinc-900 h-full overflow-y-auto">
+      <div className="flex justify-around p-4 border-b border-zinc-700">
+        {iconButtons.map((btn, index) => (
+          <div key={index} className="relative mt-4">
+            <button
+              className="text-white hover:text-blue-400 transition-colors"
+              onClick={() => {
+                if (btn.path === "/Card" || btn.path === "/wishlist") {
+                  setMenuOpen(false); // بستن منو
+                }
+                btn.action ? btn.action() : navigate(btn.path);
+              }}
+            >
+              {btn.icon}
+              {btn.badge > 0 && (
+                <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  {btn.badge}
+                </span>
+              )}
+            </button>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
+
+      <div className="p-4">
+        {navItems.reverse().map((item) => (
+          <div key={item.name} className="mb-2">
+            <div
+              className={`flex justify-between items-center p-3 rounded-lg ${
+                item.hasSubmenu ? "bg-zinc-800" : "hover:bg-zinc-800"
+              } transition-colors`}
+              onClick={() => {
+                if (!item.hasSubmenu) {
+                  navigate(item.path);
+                  setMenuOpen(false); // بستن منو
+                } else {
+                  toggleExpand(item.name);
+                }
+              }}
+            >
+              <span className="text-white font-bold">{item.name}</span>
+              {item.hasSubmenu &&
+                (expandedItems[item.name] ? (
+                  <FaChevronUp className="text-zinc-400" />
+                ) : (
+                  <FaChevronDown className="text-zinc-400" />
+                ))}
+            </div>
+
+            {item.hasSubmenu &&
+              expandedItems[item.name] &&
+              renderSubmenu(item.name)}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 };

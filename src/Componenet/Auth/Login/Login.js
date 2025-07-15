@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../../StateManagement/Action'; 
+import axios from 'axios';
+import { getUserId } from '../../StateManagement/Action'; 
 
 const Login = () => {
-  const user = useSelector(state => state.user);
-  console.log(user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
@@ -31,16 +30,29 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await dispatch(login(email, password));
+      const response = await axios.post(`http://localhost:3000/users/login`, {
+        email,
+        password,
+      });
 
-      // اینجا از وضعیت کاربر قبل از تغییر استفاده می‌کنیم
-      if (!user.error && user.isAuthenticated) {
-        navigate('/dashboard'); // در صورت ورود موفق به داشبورد بروید.
+      
+      if (email === "Admin@gmail.com") {
+        localStorage.setItem("isAdmin", "true");
       } else {
-        setError(user.error || "وارد شدن ناموفق است. لطفا دوباره تلاش کنید.");
+        localStorage.setItem("isAdmin", "false");
       }
-    } catch (err) {
-      setError("وارد شدن ناموفق است. لطفا دوباره تلاش کنید.");
+
+      localStorage.setItem("authToken", response.data.token);
+      localStorage.setItem("username", response.data.username);
+      localStorage.setItem("userId", response.data.userId);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
+      dispatch(getUserId(response.data));
+
+     
+      navigate('/dashbord');
+    } catch (error) {
+      setError(error.response?.data || error.message);
+      console.log(error)
     } finally {
       setLoading(false);
     }
@@ -59,7 +71,23 @@ const Login = () => {
 
         {error && (
           <div className="mb-3 p-2 bg-red-100 text-red-700 rounded-md">
-            {error}
+            {error === "شما ثبت‌ نام نکرده‌اید"?
+            <>
+            <p>{error}</p>
+          <button
+          disabled={loading}
+          className={`border-none bg-blue-800 py-2 px-3 text-white w-full mt-2 rounded-md hover:bg-blue-700 mb-5 ${
+            loading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
+          onClick={()=>navigate('/SignUp')}
+          >
+            {"ثبت نام"}
+          </button>
+            </>
+        :
+        error  
+        }
+            
           </div>
         )}
 
