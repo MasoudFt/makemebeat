@@ -13,6 +13,7 @@ import {
 } from "../StateManagement/Action";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import ServerURL from "../API/ServerURL";
 
 const LikeGenere = ({ OneMusicInfo }) => {
   const [musicList, setMusicList] = useState([]);
@@ -25,7 +26,8 @@ const LikeGenere = ({ OneMusicInfo }) => {
     []
   );
 
-  const imageUrl = "http://localhost:3000/"; // ServerURL()
+  // const imageUrl = "http://localhost:3000/"; // ServerURL()
+  const imageUrl = ServerURL(); // ServerURL()
 
   const getMusic = useCallback(async () => {
     if (!OneMusicInfo || !OneMusicInfo.type) {
